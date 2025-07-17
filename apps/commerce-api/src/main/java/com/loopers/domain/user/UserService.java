@@ -3,15 +3,16 @@ package com.loopers.domain.user;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Service
+@Component
 public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public UserModel signup(UserModel user) {
         if (userRepository.findByUserId(user.getUserId()).isPresent()) {
             throw new CoreException(ErrorType.BAD_REQUEST,"이미 가입된 아이디입니다.");
