@@ -103,4 +103,36 @@ public class UserUnitTest {
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
 
+
+    @DisplayName("invalidGender를 검증하는 테스트코드")
+    @ParameterizedTest
+    @ValueSource(strings={"INVALID","MALEE","FEMALL","123"})
+    public void shouldFail_whenGenderIsInvalid(String invalidGender){
+
+        // arrange
+        // act & assert
+        assertThrows(IllegalArgumentException.class, ()->{
+            Gender.valueOf(invalidGender);
+        });
+    }
+
+    @DisplayName("gender를 검증하는 테스트코드")
+    @ParameterizedTest
+    @ValueSource(strings={"M","F"})
+    public void shouldSuccess_whenGenderIsValid(String genderString){
+
+        // arrange
+        String userId = "riley1234";
+        String name = "riley";
+        String email = "riley@email.com";
+        String birth = "2000-01-01";
+        Gender gender = Gender.valueOf(genderString);
+
+        // act
+        UserModel userModel = new UserModel(userId, name, email, birth, gender);
+
+        // assert
+        assertThat(userModel.getGender()).isEqualTo(gender);
+    }
+
 }

@@ -12,7 +12,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional
     public UserModel signup(UserModel user) {
         if (userRepository.findByUserId(user.getUserId()).isPresent()) {
             throw new CoreException(ErrorType.BAD_REQUEST,"이미 가입된 아이디입니다.");
@@ -20,7 +19,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     public UserModel getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }

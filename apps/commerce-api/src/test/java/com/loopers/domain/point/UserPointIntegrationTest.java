@@ -42,8 +42,7 @@ public class UserPointIntegrationTest {
                                                 "riley@test.com",
                                                 "2000-01-01",
                                                 Gender.F));
-            UserPointModel save = userPointRepository.save(new UserPointModel(1L,
-                                                                                1000));
+            UserPointModel save = userPointRepository.save(new UserPointModel(1L,1000));
             testUserPoint = save.getPoint();
             testUserId = save.getUserId();
         }
@@ -70,10 +69,10 @@ public class UserPointIntegrationTest {
         public void shouldReturnNullWhenUserDoesNotExist() {
 
             // arrange
-            Long userId = 9999999L;
+            Long invalidUserId = 9999999L;
 
             // act
-            UserPointInfo userPoint = userPointFacade.getUserPoint(userId);
+            UserPointInfo userPoint = userPointFacade.getUserPoint(invalidUserId);
 
             // assert
             assertThat(userPoint).isNull();
