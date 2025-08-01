@@ -32,7 +32,7 @@ public class UserPointChargeIntegrationTest {
             Long invalidId = 999999L;
             // act
             CoreException exception = assertThrows(CoreException.class, () -> {
-                userPointFacade.chargeUserPoint(invalidId, 100000);
+                userPointFacade.chargeUserPoint(invalidId, 100000L);
             });
 
             // assert

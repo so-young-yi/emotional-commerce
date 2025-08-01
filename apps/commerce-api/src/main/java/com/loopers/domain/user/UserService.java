@@ -13,7 +13,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserModel signup(UserModel user) {
-        if (userRepository.findByUserId(user.getUserId()).isPresent()) {
+        if (userRepository.findByLoginId(user.getLoginId()).isPresent()) {
             throw new CoreException(ErrorType.BAD_REQUEST,"이미 가입된 아이디입니다.");
         }
         return userRepository.save(user);
@@ -24,9 +24,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserModel getUserByUserId(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[userId = " + userId + "] 사용자를 찾을 수 없습니다."));
+    public UserModel getUserByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[loginId = " + loginId + "] 사용자를 찾을 수 없습니다."));
     }
 
 
