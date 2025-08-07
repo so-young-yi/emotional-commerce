@@ -4,38 +4,39 @@ import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 
 @Entity
 @Table(name = "orders_item")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class OrderItemModel extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
+
     @Column(nullable = false)
     private Long productId;
+
     @Column(nullable = false)
     private Long quantity;
+
     @Column(nullable = false)
     private Long priceSnapshot;
+
     private String productNameSnapshot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private OrderModel order;
 
-    protected OrderItemModel() {}
-
-    public OrderItemModel(
-            Long productId,
-            Long quantity,
-            Long priceSnapshot,
-            String productNameSnapshot
-    ) {
+    public OrderItemModel(Long productId, Long quantity, Long priceSnapshot, String productNameSnapshot) {
         if (productId == null || productId <= 0)
             throw new CoreException(ErrorType.BAD_REQUEST, "상품 ID는 필수이며 1 이상이어야 합니다.");
         if (quantity == null || quantity < 1)
@@ -58,11 +59,4 @@ public class OrderItemModel extends BaseEntity {
     void setOrder(OrderModel order) {
         this.order = order;
     }
-
-    public Long getId() { return id; }
-    public Long getProductId() { return productId; }
-    public Long getQuantity() { return quantity; }
-    public Long getPriceSnapshot() { return priceSnapshot; }
-    public String getProductNameSnapshot() { return productNameSnapshot; }
-    public OrderModel getOrder() { return order; }
 }

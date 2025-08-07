@@ -20,7 +20,7 @@ class ProductModelUnitTest {
     void shouldFail_whenBrandIdIsInvalid(Long brandId) {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, brandId, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
+            new ProductModel( brandId, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -32,7 +32,7 @@ class ProductModelUnitTest {
     void shouldFail_whenNameIsNullOrBlank(String name) {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, 1L, name, "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
+            new ProductModel(1L, name, "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -42,7 +42,7 @@ class ProductModelUnitTest {
     void shouldFail_whenSellPriceIsNull() {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, 1L, "에어포스", "에어포스설명", null, 10L, ProductStatus.ON_SALE);
+            new ProductModel(1L, "에어포스", "에어포스설명", null, 10L, ProductStatus.ON_SALE);
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -53,7 +53,7 @@ class ProductModelUnitTest {
     void shouldFail_whenPriceIsNotPositive(int price) {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(price), 10L, ProductStatus.ON_SALE);
+            new ProductModel(1L, "에어포스", "에어포스설명", new Money(price), 10L, ProductStatus.ON_SALE);
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -64,7 +64,7 @@ class ProductModelUnitTest {
     void shouldFail_whenStockIsNegative(Long stock) {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, 1L, "에어포스", "에어포스설명",  new Money(10000L), stock, ProductStatus.ON_SALE);
+            new ProductModel(1L, "에어포스", "에어포스설명",  new Money(10000L), stock, ProductStatus.ON_SALE);
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -74,7 +74,7 @@ class ProductModelUnitTest {
     void shouldFail_whenStatusIsNull() {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, 1L, "에어포스", "에어포스설명",  new Money(10000L), 100L, null );
+            new ProductModel(1L, "에어포스", "에어포스설명",  new Money(10000L), 100L, null );
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -84,7 +84,7 @@ class ProductModelUnitTest {
     void shouldFail_whenOnSaleButStockIsZero() {
 
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new ProductModel(1L, 1L, "에어포스", "에어포스설명",  new Money(10000L), 0L,  ProductStatus.ON_SALE );
+            new ProductModel( 1L, "에어포스", "에어포스설명",  new Money(10000L), 0L,  ProductStatus.ON_SALE );
         });
         assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
     }
@@ -93,7 +93,7 @@ class ProductModelUnitTest {
     @Test
     void shouldSuccess_whenAllValid() {
         // arrange & act
-        ProductModel product = new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
+        ProductModel product = new ProductModel(1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
 
         // assert
         assertThat(product.getBrandId()).isEqualTo(1L);
@@ -108,7 +108,7 @@ class ProductModelUnitTest {
     void decreaseQuantity_shouldSucceed_whenEnoughStock() {
 
         // arrange
-        ProductModel product = new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
+        ProductModel product = new ProductModel(1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.ON_SALE);
 
         // act
         product.decreaseStock(3L);
@@ -122,7 +122,7 @@ class ProductModelUnitTest {
     void decreaseQuantity_shouldFail_whenNotEnoughStock() {
 
         // arrange
-        ProductModel product = new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(10000L), 2L, ProductStatus.ON_SALE);
+        ProductModel product = new ProductModel(1L, "에어포스", "에어포스설명", new Money(10000L), 2L, ProductStatus.ON_SALE);
 
         // act & assert
         CoreException exception = assertThrows(CoreException.class, () -> {
@@ -136,7 +136,7 @@ class ProductModelUnitTest {
     void decreaseQuantity_shouldFail_whenNotOrderable() {
 
         // arrange
-        ProductModel product = new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.STOPPED);
+        ProductModel product = new ProductModel(1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.STOPPED);
 
         // act & assert
         CoreException exception = assertThrows(CoreException.class, () -> {
@@ -151,7 +151,7 @@ class ProductModelUnitTest {
     void isAvailable_shouldReturnFalse_whenNotOnSale(String status) {
 
         // arrange
-        ProductModel product = new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.valueOf(status));
+        ProductModel product = new ProductModel(1L, "에어포스", "에어포스설명", new Money(10000L), 10L, ProductStatus.valueOf(status));
 
         // act & assert
         assertThat(product.isOrderable()).isFalse();
@@ -162,7 +162,7 @@ class ProductModelUnitTest {
     void isAvailable_shouldReturnTrue_whenOnSaleAndStock() {
 
         // arrange
-        ProductModel product = new ProductModel(1L, 1L, "에어포스", "에어포스설명", new Money(10000L), 5L, ProductStatus.ON_SALE);
+        ProductModel product = new ProductModel(1L, "에어포스", "에어포스설명", new Money(10000L), 5L, ProductStatus.ON_SALE);
 
         // act & assert
         assertThat(product.isOrderable()).isTrue();
