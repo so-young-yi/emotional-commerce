@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/points")
-public class UserPointV1Controller implements UserPointV1ApiSpec {
+public class UserPointV1ApiController implements UserPointV1ApiSpec {
 
     private final UserPointFacade userPointFacade;
 
