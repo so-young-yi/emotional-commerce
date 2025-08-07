@@ -1,5 +1,6 @@
 package com.loopers.domain.payment;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
@@ -10,7 +11,7 @@ import java.time.ZonedDateTime;
 @Table(name = "payment")
 @Entity
 @Getter
-public class PaymentModel {
+public class PaymentModel extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

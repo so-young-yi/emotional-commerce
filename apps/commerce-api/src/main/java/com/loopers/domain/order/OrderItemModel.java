@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
@@ -11,8 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders_item")
-@Getter
-public class OrderItemModel {
+public class OrderItemModel extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class OrderItemModel {
     private Long priceSnapshot;
     private String productNameSnapshot;
 
-    @ManyToOne( fetch = FetchType.LAZY )
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private OrderModel order;
 
@@ -51,8 +51,18 @@ public class OrderItemModel {
         this.productNameSnapshot = productNameSnapshot;
     }
 
-    protected void setOrder(OrderModel order) {
+    long getTotalPrice() {
+        return priceSnapshot * quantity;
+    }
+
+    void setOrder(OrderModel order) {
         this.order = order;
     }
 
+    public Long getId() { return id; }
+    public Long getProductId() { return productId; }
+    public Long getQuantity() { return quantity; }
+    public Long getPriceSnapshot() { return priceSnapshot; }
+    public String getProductNameSnapshot() { return productNameSnapshot; }
+    public OrderModel getOrder() { return order; }
 }

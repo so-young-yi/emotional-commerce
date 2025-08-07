@@ -1,19 +1,18 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.application.order.OrderFacade;
+import com.loopers.application.order.OrderInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/orders")
-public class OrderV1Controller implements OrderV1ApiSpec {
+public class OrderV1ApiController implements OrderV1ApiSpec {
 
     private final OrderFacade orderFacade;
 
@@ -23,7 +22,8 @@ public class OrderV1Controller implements OrderV1ApiSpec {
             @RequestHeader("X-USER-ID") Long userId,
             @RequestBody OrderV1Dto.OrderRequest request
     ) {
-        return ApiResponse.success(orderFacade.orderAndPay(userId, request));
+        OrderInfo orderInfo = orderFacade.orderAndPay(userId, request);
+        return ApiResponse.success(OrderV1Dto.OrderResponse.of(orderInfo.order(), orderInfo.payment()));
     }
 
     @GetMapping
@@ -31,7 +31,11 @@ public class OrderV1Controller implements OrderV1ApiSpec {
     public ApiResponse<List<OrderV1Dto.OrderResponse>> getOrders(
             @RequestHeader("X-USER-ID") Long userId
     ) {
-        return ApiResponse.success(orderFacade.getOrders(userId));
+        List<OrderInfo> results = orderFacade.getOrders(userId);
+        List<OrderV1Dto.OrderResponse> responses = results.stream()
+                .map(result -> OrderV1Dto.OrderResponse.of(result.order(), result.payment()))
+                .collect(Collectors.toList());
+        return ApiResponse.success(responses);
     }
 
     @GetMapping("/{orderId}")
@@ -40,9 +44,7 @@ public class OrderV1Controller implements OrderV1ApiSpec {
             @RequestHeader("X-USER-ID") Long userId,
             @PathVariable Long orderId
     ) {
-        return ApiResponse.success(orderFacade.getOrder(userId, orderId));
+        OrderInfo orderInfo = orderFacade.getOrder(userId, orderId);
+        return ApiResponse.success(OrderV1Dto.OrderResponse.of(orderInfo.order(), orderInfo.payment()));
     }
-
-
-
 }

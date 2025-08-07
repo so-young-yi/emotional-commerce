@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 public class OrderV1Dto {
 
-
     public record OrderRequest(
             List<OrderItem> items
     ){}
@@ -40,7 +39,7 @@ public class OrderV1Dto {
                     itemResponses,
                     payment != null ? PaymentResponse.of(payment) : null
             );
-
+        }
     }
 
     public record OrderItemResponse(
@@ -48,7 +47,7 @@ public class OrderV1Dto {
             Long productId,
             String productNameSnapshot,
             Long quantity,
-            Long priceSnapshot // 1개당 가격 스냅샷
+            Long priceSnapshot
     ) {
         public static OrderItemResponse of(OrderItemModel item) {
             return new OrderItemResponse(
@@ -59,7 +58,6 @@ public class OrderV1Dto {
                     item.getPriceSnapshot()
             );
         }
-
     }
 
     public record PaymentResponse(
@@ -79,8 +77,4 @@ public class OrderV1Dto {
             );
         }
     }
-
-
-    }
-
 }

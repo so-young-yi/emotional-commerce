@@ -32,7 +32,6 @@ public class OrderModel extends BaseEntity {
             Long userId,
             OrderStatus status
     ) {
-
         if (userId == null || userId <= 0)
             throw new CoreException(ErrorType.BAD_REQUEST, "주문자 ID는 필수이며 1 이상이어야 합니다.");
         if (status == null)
@@ -44,10 +43,21 @@ public class OrderModel extends BaseEntity {
 
     public void addOrderItem(OrderItemModel orderItem) {
         orderItems.add(orderItem);
-        orderItem.setOrder(this); // 자식에도 부모 세팅
+        orderItem.setOrder(this);
     }
 
     public void cancel() {
         this.status = OrderStatus.CANCELLED;
+    }
+
+    public void pay() {
+        if (this.status != OrderStatus.ORDERED) {
+            throw new CoreException(ErrorType.CONFLICT, "결제 가능한 상태가 아닙니다.");
+        }
+        this.status = OrderStatus.PAID;
+    }
+
+    public long getTotalAmount() {
+        return orderItems.stream().mapToLong(OrderItemModel::getTotalPrice).sum();
     }
 }
