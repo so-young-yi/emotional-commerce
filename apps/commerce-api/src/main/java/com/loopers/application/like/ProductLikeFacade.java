@@ -1,31 +1,40 @@
 package com.loopers.application.like;
 
 import com.loopers.domain.like.ProductLikeService;
+import com.loopers.domain.product.ProductMetaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Component
 public class ProductLikeFacade {
 
     private final ProductLikeService productLikeService;
+    private final ProductMetaService productMetaService;
 
-    // 좋아요 등록 (멱등성 보장)
+    @Transactional
     public boolean likeProduct(Long userId, Long productId) {
-        return productLikeService.likeProduct(new ProductLikeInfo(userId, productId));
+        boolean liked = productLikeService.likeProduct(new ProductLikeInfo(userId, productId));
+        if (liked) {
+            productMetaService.increaseLike(productId);
+        }
+        return liked;
     }
 
-    // 좋아요 해제 (멱등성 보장)
+    @Transactional
     public boolean unlikeProduct(Long userId, Long productId) {
-        return productLikeService.unlikeProduct(new ProductLikeInfo(userId, productId));
+        boolean unliked = productLikeService.unlikeProduct(new ProductLikeInfo(userId, productId));
+        if (unliked) {
+            productMetaService.decreaseLike(productId);
+        }
+        return unliked;
     }
 
-    // 좋아요 여부 조회
     public boolean isProductLiked(Long userId, Long productId) {
         return productLikeService.isProductLiked(new ProductLikeInfo(userId, productId));
     }
 
-    // 좋아요 수 조회
     public long getLikeCountOfProduct(Long productId) {
         return productLikeService.getLikeCountOfProduct(productId);
     }

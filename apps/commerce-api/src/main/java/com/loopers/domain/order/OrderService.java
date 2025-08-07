@@ -15,29 +15,13 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final ProductService productService;
 
-    public OrderModel createOrder(Long userId, OrderV1Dto.OrderRequest request) {
+    public OrderModel createOrder(Long userId, List<OrderItemModel> orderItems) {
         OrderModel order = new OrderModel(userId, OrderStatus.ORDERED);
-
-        for (OrderV1Dto.OrderItem item : request.items()) {
-            ProductModel product = productService.getProductDetail(item.productId());
-            OrderItemModel orderItem = new OrderItemModel(
-                    product.getId(),
-                    item.quantity(),
-                    product.getSellPrice().getAmount(),
-                    product.getName()
-            );
-            order.addOrderItem(orderItem);
+        for (OrderItemModel item : orderItems) {
+            order.addOrderItem(item);
         }
-
         return orderRepository.save(order);
-    }
-
-    public void decreaseStocks(OrderModel order) {
-        order.getOrderItems().forEach(item -> {
-            productService.decreaseStock(item.getProductId(), item.getQuantity());
-        });
     }
 
     public void cancelOrder(Long orderId) {

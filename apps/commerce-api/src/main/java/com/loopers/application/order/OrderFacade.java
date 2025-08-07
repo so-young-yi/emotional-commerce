@@ -1,14 +1,20 @@
 package com.loopers.application.order;
 
+import com.loopers.domain.order.OrderItemModel;
 import com.loopers.domain.order.OrderModel;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentModel;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.point.UserPointService;
+import com.loopers.domain.product.ProductMetaService;
+import com.loopers.domain.product.ProductModel;
+import com.loopers.domain.product.ProductService;
 import com.loopers.interfaces.api.order.OrderV1Dto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,23 +25,45 @@ import java.util.stream.Collectors;
 @Component
 public class OrderFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderFacade.class);
     private final OrderService orderService;
     private final PaymentService paymentService;
+    private final ProductService productService;
     private final UserPointService pointService;
+    private final ProductMetaService productMetaService;
 
     @Transactional
     public OrderInfo orderAndPay(Long userId, OrderV1Dto.OrderRequest request) {
-        OrderModel order = orderService.createOrder(userId, request);
+
+        OrderModel order = createOrder(userId, request);
 
         long totalAmount = order.getTotalAmount();
-
-        pointService.useUserPoint(userId, totalAmount);
+        pointService.useUserPointWithLock(userId, totalAmount);
 
         PaymentModel payment = paymentService.pay(order.getId(), totalAmount);
 
-        orderService.decreaseStocks(order);
+        for (OrderItemModel orderItem : order.getOrderItems()) {
+            productMetaService.decreaseStock(orderItem.getProductId(), orderItem.getQuantity());
+        }
 
         return new OrderInfo(order, payment);
+    }
+
+    @Transactional
+    public OrderModel createOrder(Long userId, OrderV1Dto.OrderRequest request) {
+        List<OrderItemModel> orderItems = request.items().stream()
+                .map(item -> {
+                    ProductModel product = productService.getProductDetail(item.productId());
+                    return new OrderItemModel(
+                            product.getId(),
+                            item.quantity(),
+                            product.getSellPrice().getAmount(),
+                            product.getName()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return orderService.createOrder(userId, orderItems);
     }
 
     public List<OrderInfo> getOrders(Long userId) {

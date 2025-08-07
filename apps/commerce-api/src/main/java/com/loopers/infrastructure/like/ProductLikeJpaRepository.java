@@ -7,14 +7,10 @@ import java.util.List;
 
 public interface ProductLikeJpaRepository extends JpaRepository<ProductLikeModel, Long> {
 
-    boolean existsByUserIdAndProductId( Long userId, Long productId );
-
-    void deleteByUserIdAndProductId( Long userId, Long productId );
-
+    boolean existsByUserIdAndProductId(Long userId, Long productId);
+    void deleteByUserIdAndProductId(Long userId, Long productId);
     long countByProductId(Long productId);
-
-    List<ProductLikeModel> findProductIdByUserId( Long userId );
-
-    List<Long> findUserByProductId(Long productId );
+    List<ProductLikeModel> findProductIdByUserId(Long userId);
+    List<Long> findUserByProductId(Long productId);
 
 }

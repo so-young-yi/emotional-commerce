@@ -31,7 +31,6 @@ class ProductIntegrationTest {
                     "에어맥스",
                     "에어맥스 설명",
                     new Money(100000L),
-                    10L,
                     ProductStatus.ON_SALE,
                     java.time.ZonedDateTime.now()
             );
@@ -56,8 +55,8 @@ class ProductIntegrationTest {
         void findByBrandId_shouldReturnProductList() {
             // arrange
             Long brandId = 1L;
-            ProductModel product1 = new ProductModel(null, brandId, "에어맥스", "설명", new Money(100000L), 10L, ProductStatus.ON_SALE, java.time.ZonedDateTime.now());
-            ProductModel product2 = new ProductModel(null, brandId, "에어포스", "설명", new Money(120000L), 5L, ProductStatus.ON_SALE, java.time.ZonedDateTime.now());
+            ProductModel product1 = new ProductModel(null, brandId, "에어맥스", "설명", new Money(100000L), ProductStatus.ON_SALE, java.time.ZonedDateTime.now());
+            ProductModel product2 = new ProductModel(null, brandId, "에어포스", "설명", new Money(120000L), ProductStatus.ON_SALE, java.time.ZonedDateTime.now());
             productRepository.save(product1);
             productRepository.save(product2);
 
@@ -69,24 +68,4 @@ class ProductIntegrationTest {
         }
     }
 
-    @Nested
-    @DisplayName("상품 재고 차감 통합 테스트")
-    class DecreaseStock {
-
-        @Test
-        @DisplayName("상품 재고를 차감하면 DB에 반영된다")
-        void decreaseStock_shouldUpdateStock() {
-            // arrange
-            ProductModel product = new ProductModel(null, 1L, "에어맥스", "설명", new Money(100000L), 10L, ProductStatus.ON_SALE, java.time.ZonedDateTime.now());
-            ProductModel saved = productRepository.save(product);
-
-            // act
-            saved.decreaseStock(3L);
-            productRepository.save(saved);
-
-            // assert
-            ProductModel found = productRepository.findById(saved.getId()).orElse(null);
-            assertThat(found.getStock()).isEqualTo(7L);
-        }
-    }
 }

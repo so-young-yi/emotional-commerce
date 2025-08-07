@@ -2,8 +2,9 @@ package com.loopers.application.product;
 
 import com.loopers.domain.brand.BrandModel;
 import com.loopers.domain.brand.BrandService;
+import com.loopers.domain.product.ProductMetaModel;
+import com.loopers.domain.product.ProductMetaService;
 import com.loopers.domain.product.ProductService;
-import com.loopers.domain.like.ProductLikeService;
 import com.loopers.interfaces.api.product.ProductV1Dto;
 import com.loopers.domain.product.ProductModel;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 public class ProductFacade {
 
     private final ProductService productService;
-    private final ProductLikeService productLikeService;
+    private final ProductMetaService productMetaService;
     private final BrandService brandService;
 
     public ProductV1Dto.ProductListPageResponse getProductList(ProductSearchCriteria criteria) {
@@ -28,7 +29,7 @@ public class ProductFacade {
         List<ProductModel> products = productPage.getContent();
 
         List<Long> productIds = products.stream().map(ProductModel::getId).toList();
-        Map<Long, Long> likeCountMap = productLikeService.getLikeCountsForProductIds(productIds);
+        Map<Long, ProductMetaModel> metaMap = productMetaService.getMetasForProductIds(productIds);
 
         List<Long> brandIds = products.stream().map(ProductModel::getBrandId).distinct().toList();
         Map<Long, String> brandNameMap = brandIds.stream()
@@ -41,15 +42,18 @@ public class ProductFacade {
                 ));
 
         List<ProductV1Dto.ProductSummaryResponse> dtos = products.stream()
-                .map(product -> new ProductV1Dto.ProductSummaryResponse(
-                        product.getId(),
-                        product.getName(),
-                        brandNameMap.get(product.getBrandId()),
-                        product.getSellPrice().getAmount(),
-                        product.getStock(),
-                        product.getStatus().name(),
-                        likeCountMap.getOrDefault(product.getId(), 0L)
-                ))
+                .map(product -> {
+                    ProductMetaModel meta = metaMap.get(product.getId());
+                    return new ProductV1Dto.ProductSummaryResponse(
+                            product.getId(),
+                            product.getName(),
+                            brandNameMap.get(product.getBrandId()),
+                            product.getSellPrice().getAmount(),
+                            meta != null ? meta.getStock() : 0L,
+                            product.getStatus().name(),
+                            meta != null ? meta.getLikeCount() : 0L
+                    );
+                })
                 .collect(Collectors.toList());
 
         if ("likes_desc".equals(criteria.sort())) {
@@ -69,7 +73,8 @@ public class ProductFacade {
 
     public ProductV1Dto.ProductDetailResponse getProductDetail(Long productId) {
         ProductModel product = productService.getProductDetail(productId);
-        long likeCount = productLikeService.getLikeCountOfProduct(productId);
+        ProductMetaModel meta = productMetaService.getMeta(productId);
+
         String brandName = null;
         if (product.getBrandId() != null) {
             BrandModel brand = brandService.getBrand(product.getBrandId());
@@ -81,9 +86,9 @@ public class ProductFacade {
                 product.getName(),
                 brandName,
                 product.getSellPrice().getAmount(),
-                product.getStock(),
+                meta != null ? meta.getStock() : 0L,
                 product.getStatus().name(),
-                likeCount
+                meta != null ? meta.getLikeCount() : 0L
         );
     }
 }
