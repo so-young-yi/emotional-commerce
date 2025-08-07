@@ -13,22 +13,23 @@ public class UserPointService {
     private final UserPointRepository userPointRepository;
     private final PointHistoryRepository pointHistoryRepository;
 
-    @Transactional(readOnly = true)
     public UserPointModel getUserPoint(Long userId) {
        return userPointRepository.findByUserId(userId).orElse(null);
     }
 
     @Transactional
-    public UserPointModel chargeUserPoint(Long userId, Long point) {
-        UserPointModel userPoint = getUserPoint(userId);
+    public UserPointModel chargeUserPointWithLock(Long userId, Long point) {
+        UserPointModel userPoint = userPointRepository.findByUserIdForUpdate(userId)
+                .orElseGet(() -> new UserPointModel(userId, 0L));
         userPoint.charge(point);
         userPointRepository.save(userPoint);
         pointHistoryRepository.save(new PointHistoryModel(userId, point, "포인트 충전"));
         return userPoint;
     }
 
-    public void useUserPoint(Long userId, Long amount) {
-        UserPointModel userPoint = userPointRepository.findByUserId(userId)
+    @Transactional
+    public void useUserPointWithLock(Long userId, Long amount) {
+        UserPointModel userPoint = userPointRepository.findByUserIdForUpdate(userId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "포인트 정보 없음"));
         if (userPoint.getBalance() < amount) {
             throw new CoreException(ErrorType.BAD_REQUEST, "포인트 부족");

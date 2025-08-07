@@ -25,6 +25,6 @@ public class UserPointFacade {
         if ( userService.getUserById(userId) == null ) {
             throw new CoreException(ErrorType.NOT_FOUND, "[userId = " + userId + "] 사용자를 찾을 수 없습니다.");
         }
-        return UserPointInfo.from(userPointService.chargeUserPoint(userId, amount));
+        return UserPointInfo.from(userPointService.chargeUserPointWithLock(userId, amount));
     }
 }
