@@ -12,10 +12,10 @@ public record ProductLikeInfo(
         if (userId == null || userId <= 0) throw new CoreException(ErrorType.BAD_REQUEST,"유효하지 않은 userId");
         if (productId == null || productId <= 0) throw new CoreException(ErrorType.BAD_REQUEST,"유효하지 않은 productId");
     }
-    public ProductLikeInfo from(ProductLikeModel productLikeModel) {
+    public static ProductLikeInfo from(ProductLikeModel productLikeModel) {
         return new ProductLikeInfo(
                 productLikeModel.getUserId(),
-                productLikeModel.getUserId()
+                productLikeModel.getProductId()
         );
     }
     public ProductLikeModel toModel() {
