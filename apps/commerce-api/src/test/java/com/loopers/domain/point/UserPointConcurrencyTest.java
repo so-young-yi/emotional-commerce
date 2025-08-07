@@ -125,7 +125,7 @@ class UserPointConcurrencyTest {
             int threadCount = 10;
             runConcurrent(threadCount, () -> {
                 OrderV1Dto.OrderRequest request = new OrderV1Dto.OrderRequest(
-                        Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L))
+                        Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L,null)),null
                 );
                 try { orderFacade.orderAndPay(userId, request); } catch (Exception ignored) {}
             });

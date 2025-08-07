@@ -1,5 +1,6 @@
 package com.loopers.application.order;
 
+import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.OrderItemModel;
 import com.loopers.domain.order.OrderModel;
 import com.loopers.domain.order.OrderService;
@@ -31,13 +32,21 @@ public class OrderFacade {
     private final ProductService productService;
     private final UserPointService pointService;
     private final ProductMetaService productMetaService;
+    private final CouponService couponService;
 
     @Transactional
     public OrderInfo orderAndPay(Long userId, OrderV1Dto.OrderRequest request) {
 
         OrderModel order = createOrder(userId, request);
 
-        long totalAmount = order.getTotalAmount();
+        long couponDiscount = 0L;
+        if (request.couponId() != null) {
+            couponDiscount = couponService.useCoupon(userId, request.couponId(), order.getTotalAmount());
+        }
+
+        long totalAmount = order.getTotalAmount() - couponDiscount;
+        if (totalAmount < 0) totalAmount = 0;
+
         pointService.useUserPointWithLock(userId, totalAmount);
 
         PaymentModel payment = paymentService.pay(order.getId(), totalAmount);

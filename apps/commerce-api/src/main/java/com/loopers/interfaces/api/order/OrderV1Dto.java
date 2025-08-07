@@ -10,12 +10,14 @@ import java.util.stream.Collectors;
 public class OrderV1Dto {
 
     public record OrderRequest(
-            List<OrderItem> items
+            List<OrderItem> items,
+            Long couponId // 장바구니 쿠폰
     ){}
 
     public record OrderItem(
             Long productId,
-            Long quantity
+            Long quantity,
+            Long couponId // 상품별 쿠폰
     ){}
 
     public record OrderResponse(

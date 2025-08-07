@@ -50,7 +50,7 @@ class OrderAtomicityIntegrationTest {
     @DisplayName("재고 부족 시 전체 롤백")
     void shouldRollback_whenStockNotEnough() {
         OrderV1Dto.OrderRequest request = new OrderV1Dto.OrderRequest(
-                Collections.singletonList(new OrderV1Dto.OrderItem(productId, 20L)) // 재고 10, 주문 20
+                Collections.singletonList(new OrderV1Dto.OrderItem(productId, 20L,null)),null // 재고 10, 주문 20
         );
         assertThrows(Exception.class, () -> orderFacade.orderAndPay(userId, request));
         // 재고, 포인트 모두 변하지 않아야 함
@@ -63,7 +63,7 @@ class OrderAtomicityIntegrationTest {
     void shouldRollback_whenPointNotEnough() {
         // 포인트 10_000, 상품 2개 주문(2만)
         OrderV1Dto.OrderRequest request = new OrderV1Dto.OrderRequest(
-                Collections.singletonList(new OrderV1Dto.OrderItem(productId, 2L))
+                Collections.singletonList(new OrderV1Dto.OrderItem(productId, 2L,null)),null
         );
         assertThrows(Exception.class, () -> orderFacade.orderAndPay(userId, request));
         assertThat(productMetaRepository.findByProductId(productId).get().getStock()).isEqualTo(10L);
@@ -74,7 +74,7 @@ class OrderAtomicityIntegrationTest {
     @DisplayName("정상 주문 시 모든 처리 정상 반영")
     void shouldCommit_whenOrderSuccess() {
         OrderV1Dto.OrderRequest request = new OrderV1Dto.OrderRequest(
-                Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L))
+                Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L,null)),null
         );
         orderFacade.orderAndPay(userId, request);
         assertThat(productMetaRepository.findByProductId(productId).get().getStock()).isEqualTo(9L);
