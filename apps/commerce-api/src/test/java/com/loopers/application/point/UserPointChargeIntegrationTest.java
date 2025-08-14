@@ -1,8 +1,9 @@
-package com.loopers.domain.point;
+package com.loopers.application.point;
 
-import com.loopers.application.point.UserPointFacade;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,13 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 public class UserPointChargeIntegrationTest {
 
+    @Autowired private UserPointFacade userPointFacade;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
+
     @DisplayName("포인트 충전할때, ")
     @Nested
     class PointCharge{
-
-
-        @Autowired
-        private UserPointFacade userPointFacade;
 
         @DisplayName("존재하지 않는 유저 ID 충전 시 실패")
         @Test

@@ -1,6 +1,9 @@
-package com.loopers.domain.point;
+package com.loopers.application.point;
 
 import com.loopers.application.order.OrderFacade;
+import com.loopers.domain.point.UserPointModel;
+import com.loopers.domain.point.UserPointRepository;
+import com.loopers.domain.point.UserPointService;
 import com.loopers.domain.product.*;
 import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.UserModel;
@@ -25,17 +28,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DisplayName("UserPoint 동시성 테스트")
 class UserPointConcurrencyTest {
 
-    @Autowired private UserPointService userPointService;
-    @Autowired private UserPointRepository userPointRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private UserPointJpaRepository userPointJpaRepository;
-    @Autowired private DatabaseCleanUp databaseCleanUp;
     @Autowired private OrderFacade orderFacade;
+    @Autowired private UserPointService userPointService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserPointRepository userPointRepository;
+    @Autowired private UserPointJpaRepository userPointJpaRepository;
     @Autowired private ProductRepository productRepository;
-    @Autowired private ProductMetaRepository productMetaRepository;
+    @Autowired private ProductStockRepository productStockRepository;
 
-    @AfterEach
-    void tearDown() { databaseCleanUp.truncateAllTables(); }
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private Long createUserWithPoint(long point) {
         UserModel user = userRepository.save(new UserModel("user", "유저", "user@email.com", "2000-01-01", Gender.F));
@@ -47,7 +49,10 @@ class UserPointConcurrencyTest {
         ProductModel product = productRepository.save(new ProductModel(
                 null, 1L, "상품", "설명", new Money(10_000L), ProductStatus.ON_SALE, ZonedDateTime.now()
         ));
-        productMetaRepository.save(ProductMetaModel.builder().productId(product.getId()).stock(stock).likeCount(0L).reviewCount(0L).viewCount(0L).build());
+        productStockRepository.save(ProductStockModel.builder()
+                .productId(product.getId())
+                .stock(stock)
+                .build());
         return product.getId();
     }
 
@@ -123,11 +128,13 @@ class UserPointConcurrencyTest {
         @DisplayName("동일한 유저가 여러 주문을 동시에 수행해도 포인트가 음수가 되지 않는다")
         void shouldNotAllowNegativePoint_whenOrderConcurrently() throws InterruptedException {
             int threadCount = 10;
+            OrderV1Dto.OrderRequest request = new OrderV1Dto.OrderRequest(
+                    Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L,null)),null
+            );
             runConcurrent(threadCount, () -> {
-                OrderV1Dto.OrderRequest request = new OrderV1Dto.OrderRequest(
-                        Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L,null)),null
-                );
-                try { orderFacade.orderAndPay(userId, request); } catch (Exception ignored) {}
+                try {
+                    orderFacade.orderAndPay(userId, request);
+                } catch (Exception ignored) {}
             });
             Long point = userPointRepository.findByUserId(userId).get().getBalance();
             assertThat(point).isEqualTo(0L);

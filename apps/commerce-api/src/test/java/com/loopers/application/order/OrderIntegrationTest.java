@@ -1,5 +1,11 @@
-package com.loopers.domain.order;
+package com.loopers.application.order;
 
+import com.loopers.domain.order.OrderItemModel;
+import com.loopers.domain.order.OrderModel;
+import com.loopers.domain.order.OrderRepository;
+import com.loopers.domain.order.OrderStatus;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,8 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class OrderIntegrationTest {
 
-    @Autowired
-    private OrderRepository orderRepository;
+    @Autowired private OrderRepository orderRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     @Nested
     @DisplayName("주문 생성/조회 통합 테스트")

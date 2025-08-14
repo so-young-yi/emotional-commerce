@@ -1,7 +1,7 @@
 package com.loopers.application.product;
 
-import com.loopers.domain.product.ProductModel;
-import com.loopers.domain.product.ProductMetaModel;
+import com.loopers.domain.product.ProductDetailProjection;
+import com.loopers.domain.product.ProductSummaryProjection;
 
 public record ProductInfo(
         Long id,
@@ -12,15 +12,27 @@ public record ProductInfo(
         Long stock,
         String status
 ) {
-    public static ProductInfo from(ProductModel model, ProductMetaModel meta) {
+    public static ProductInfo from(ProductSummaryProjection p) {
         return new ProductInfo(
-                model.getId(),
-                model.getBrandId(),
-                model.getName(),
-                model.getDescription(),
-                model.getSellPrice().getAmount(),
-                meta != null ? meta.getStock() : 0L, // 메타가 없으면 0L로 처리
-                model.getStatus().name()
+                p.getId(),
+                p.getBrandId(),
+                p.getName(),
+                p.getDescription(),
+                p.getSellPrice(),
+                p.getStock(),
+                p.getStatus()
+        );
+    }
+
+    public static ProductInfo from(ProductDetailProjection p) {
+        return new ProductInfo(
+                p.getId(),
+                p.getBrandId(),
+                p.getName(),
+                p.getDescription(),
+                p.getSellPrice(),
+                p.getStock(),
+                p.getStatus()
         );
     }
 }

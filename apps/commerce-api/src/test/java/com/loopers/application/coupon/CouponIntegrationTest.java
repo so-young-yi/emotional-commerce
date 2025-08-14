@@ -1,7 +1,12 @@
-package com.loopers.domain.coupon;
+package com.loopers.application.coupon;
 
-import com.loopers.application.coupon.CouponFacade;
+import com.loopers.domain.coupon.CouponModel;
+import com.loopers.domain.coupon.CouponRepository;
+import com.loopers.domain.coupon.CouponType;
+import com.loopers.domain.coupon.UserCouponRepository;
 import com.loopers.support.error.CoreException;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("CouponFacade 통합 테스트")
 class CouponIntegrationTest {
 
-    @Autowired
-    private CouponFacade couponFacade;
+    @Autowired private CouponFacade couponFacade;
     @Autowired private CouponRepository couponRepository;
     @Autowired private UserCouponRepository userCouponRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private Long userId = 1L;
     private Long couponId;

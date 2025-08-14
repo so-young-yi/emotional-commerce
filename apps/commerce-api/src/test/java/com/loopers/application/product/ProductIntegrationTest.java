@@ -1,6 +1,11 @@
-package com.loopers.domain.product;
+package com.loopers.application.product;
 
+import com.loopers.domain.product.ProductModel;
+import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.product.ProductStatus;
 import com.loopers.support.Money;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,8 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class ProductIntegrationTest {
 
-    @Autowired
-    private ProductRepository productRepository;
+    @Autowired private ProductRepository productRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     @Nested
     @DisplayName("상품 생성/조회 통합 테스트")

@@ -1,15 +1,13 @@
-package com.loopers.domain.point;
+package com.loopers.application.point;
 
-import com.loopers.application.point.UserPointFacade;
-import com.loopers.application.point.UserPointInfo;
+import com.loopers.domain.point.UserPointModel;
+import com.loopers.domain.point.UserPointRepository;
 import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.UserModel;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.support.error.CoreException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,18 +19,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 public class UserPointIntegrationTest {
 
+    @Autowired private UserPointFacade userPointFacade;
+    @Autowired UserRepository userRepository;
+    @Autowired UserPointRepository userPointRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
+
     @DisplayName("포인트 조회할때, ")
     @Nested
     class PointGet{
-
-        @Autowired
-        UserRepository userRepository;
-
-        @Autowired
-        UserPointRepository userPointRepository;
-
-        @Autowired
-        private UserPointFacade userPointFacade;
 
         Long testUserId;
         Long testUserPoint;

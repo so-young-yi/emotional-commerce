@@ -1,17 +1,16 @@
-package com.loopers.domain.product;
+package com.loopers.application.product;
 
 import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.point.UserPointModel;
 import com.loopers.domain.point.UserPointRepository;
+import com.loopers.domain.product.*;
 import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.UserModel;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.order.OrderV1Dto;
 import com.loopers.support.Money;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -27,25 +26,25 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @DisplayName("Product 재고 동시성 테스트")
-class ProductStockConcurrencyTest {
+class ProductStockModelConcurrencyTest {
 
-    @Autowired private ProductMetaService productMetaService;
-    @Autowired private ProductMetaRepository productMetaRepository;
-    @Autowired private ProductRepository productRepository;
+    @Autowired private OrderFacade orderFacade;
+    @Autowired private ProductStockService productStockService;
     @Autowired private UserRepository userRepository;
     @Autowired private UserPointRepository userPointRepository;
-    @Autowired private OrderFacade orderFacade;
+    @Autowired private ProductRepository productRepository;
+    @Autowired private ProductStockRepository productStockRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private Long createProductWithStock(long stock) {
         ProductModel product = productRepository.save(new ProductModel(
                 null, 1L, "상품", "설명", new Money(10_000L), ProductStatus.ON_SALE, ZonedDateTime.now()
         ));
-        productMetaRepository.save(ProductMetaModel.builder()
+        productStockRepository.save(ProductStockModel.builder()
                 .productId(product.getId())
                 .stock(stock)
-                .likeCount(0L)
-                .reviewCount(0L)
-                .viewCount(0L)
                 .build());
         return product.getId();
     }
@@ -74,7 +73,6 @@ class ProductStockConcurrencyTest {
         executorService.shutdown();
     }
 
-
     @Nested
     @DisplayName("직접 재고 차감 동시성")
     class DirectDecreaseStock {
@@ -93,11 +91,11 @@ class ProductStockConcurrencyTest {
             long decreaseAmount = 1L;
             runConcurrent(threadCount, () -> {
                 try {
-                    productMetaService.decreaseStock(productId, decreaseAmount);
+                    productStockService.decreaseStockWithLock(productId, decreaseAmount);
                 } catch (Exception ignored) {}
             });
 
-            Long stock = productMetaService.getMeta(productId).getStock();
+            Long stock = productStockService.getStock(productId).getStock();
             assertThat(stock).isGreaterThanOrEqualTo(0L);
             assertThat(stock).isEqualTo(0L);
         }
@@ -123,7 +121,7 @@ class ProductStockConcurrencyTest {
                 } catch (Exception ignored) {}
             });
 
-            Long stock = productMetaRepository.findByProductId(productId).get().getStock();
+            Long stock = productStockService.getStock(productId).getStock();
             assertThat(stock).isGreaterThanOrEqualTo(0L);
             assertThat(stock).isEqualTo(0L);
         }
@@ -146,7 +144,7 @@ class ProductStockConcurrencyTest {
                 } catch (Exception ignored) {}
             });
 
-            Long stock = productMetaRepository.findByProductId(productId).get().getStock();
+            Long stock = productStockService.getStock(productId).getStock();
             assertThat(stock).isGreaterThanOrEqualTo(0L);
             assertThat(stock).isEqualTo(0L);
         }

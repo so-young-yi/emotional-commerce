@@ -1,6 +1,5 @@
-package com.loopers.domain.order;
+package com.loopers.application.order;
 
-import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.point.UserPointModel;
 import com.loopers.domain.point.UserPointRepository;
 import com.loopers.domain.product.*;
@@ -9,6 +8,8 @@ import com.loopers.domain.user.UserModel;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.order.OrderV1Dto;
 import com.loopers.support.Money;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,25 +26,27 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("주문 원자성/실패 케이스 통합 테스트")
 class OrderAtomicityIntegrationTest {
 
-    @Autowired
-    private OrderFacade orderFacade;
+    @Autowired private OrderFacade orderFacade;
     @Autowired private ProductRepository productRepository;
-    @Autowired private ProductMetaRepository productMetaRepository;
+    @Autowired private ProductStockRepository productStockRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private UserPointRepository userPointRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private Long productId;
     private Long userId;
 
     @BeforeEach
     void setUp() {
-        // 유저, 포인트, 상품, 상품메타 세팅
+        // 유저, 포인트, 상품, 상품스톡 세팅
         UserModel user = userRepository.save(new UserModel("user", "유저", "user@email.com", "2000-01-01", Gender.F));
         userId = user.getId();
         userPointRepository.save(new UserPointModel(userId, 10_000L));
         ProductModel product = productRepository.save(new ProductModel(null, 1L, "상품", "설명", new Money(10_000L), ProductStatus.ON_SALE, ZonedDateTime.now()));
         productId = product.getId();
-        productMetaRepository.save(ProductMetaModel.builder().productId(productId).stock(10L).likeCount(0L).reviewCount(0L).viewCount(0L).build());
+        productStockRepository.save(ProductStockModel.builder().productId(productId).stock(10L).build());
     }
 
     @Test
@@ -54,7 +57,7 @@ class OrderAtomicityIntegrationTest {
         );
         assertThrows(Exception.class, () -> orderFacade.orderAndPay(userId, request));
         // 재고, 포인트 모두 변하지 않아야 함
-        assertThat(productMetaRepository.findByProductId(productId).get().getStock()).isEqualTo(10L);
+        assertThat(productStockRepository.findByProductId(productId).get().getStock()).isEqualTo(10L);
         assertThat(userPointRepository.findByUserId(userId).get().getBalance()).isEqualTo(10_000L);
     }
 
@@ -66,7 +69,7 @@ class OrderAtomicityIntegrationTest {
                 Collections.singletonList(new OrderV1Dto.OrderItem(productId, 2L,null)),null
         );
         assertThrows(Exception.class, () -> orderFacade.orderAndPay(userId, request));
-        assertThat(productMetaRepository.findByProductId(productId).get().getStock()).isEqualTo(10L);
+        assertThat(productStockRepository.findByProductId(productId).get().getStock()).isEqualTo(10L);
         assertThat(userPointRepository.findByUserId(userId).get().getBalance()).isEqualTo(10_000L);
     }
 
@@ -77,7 +80,7 @@ class OrderAtomicityIntegrationTest {
                 Collections.singletonList(new OrderV1Dto.OrderItem(productId, 1L,null)),null
         );
         orderFacade.orderAndPay(userId, request);
-        assertThat(productMetaRepository.findByProductId(productId).get().getStock()).isEqualTo(9L);
+        assertThat(productStockRepository.findByProductId(productId).get().getStock()).isEqualTo(9L);
         assertThat(userPointRepository.findByUserId(userId).get().getBalance()).isEqualTo(0L);
     }
 }

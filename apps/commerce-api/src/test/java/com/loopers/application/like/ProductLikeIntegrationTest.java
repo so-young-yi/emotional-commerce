@@ -1,5 +1,7 @@
-package com.loopers.domain.like;
+package com.loopers.application.like;
 
+import com.loopers.domain.like.ProductLikeModel;
+import com.loopers.domain.like.ProductLikeRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,12 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class ProductLikeIntegrationTest {
 
-    @Autowired
-    private ProductLikeRepository productLikeRepository;
-    @Autowired
-    private DatabaseCleanUp databaseCleanUp;
-    @AfterEach
-    void tearDown() { databaseCleanUp.truncateAllTables(); }
+    @Autowired private ProductLikeRepository productLikeRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     @Nested
     @DisplayName("상품 좋아요 등록/해제 통합 테스트")

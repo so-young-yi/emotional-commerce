@@ -1,6 +1,5 @@
-package com.loopers.domain.order;
+package com.loopers.application.order;
 
-import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.point.UserPointModel;
 import com.loopers.domain.point.UserPointRepository;
 import com.loopers.domain.product.*;
@@ -9,10 +8,8 @@ import com.loopers.domain.user.UserModel;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.order.OrderV1Dto;
 import com.loopers.support.Money;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -31,10 +28,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderConcurrencyTest {
 
     @Autowired private OrderFacade orderFacade;
-    @Autowired private ProductRepository productRepository;
-    @Autowired private ProductMetaRepository productMetaRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private UserPointRepository userPointRepository;
+    @Autowired private ProductRepository productRepository;
+    @Autowired private ProductStockRepository productStockRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private Long productId;
 
@@ -42,12 +42,9 @@ class OrderConcurrencyTest {
         ProductModel product = productRepository.save(new ProductModel(
                 null, 1L, "에어맥스", "설명", new Money(10_000L), ProductStatus.ON_SALE, ZonedDateTime.now()
         ));
-        productMetaRepository.save(ProductMetaModel.builder()
+        productStockRepository.save(ProductStockModel.builder()
                 .productId(product.getId())
                 .stock(stock)
-                .likeCount(0L)
-                .reviewCount(0L)
-                .viewCount(0L)
                 .build());
         return product.getId();
     }
@@ -103,7 +100,7 @@ class OrderConcurrencyTest {
                 try { orderFacade.orderAndPay(userId, request); } catch (Exception ignored) {}
             });
 
-            Long stock = productMetaRepository.findByProductId(productId).get().getStock();
+            Long stock = productStockRepository.findByProductId(productId).get().getStock();
             assertThat(stock).isGreaterThanOrEqualTo(0L);
             assertThat(stock).isEqualTo(0L);
         }
@@ -137,7 +134,7 @@ class OrderConcurrencyTest {
                 }
             });
 
-            Long stock = productMetaRepository.findByProductId(productId).get().getStock();
+            Long stock = productStockRepository.findByProductId(productId).get().getStock();
             assertThat(stock).isGreaterThanOrEqualTo(0L);
             assertThat(stock).isEqualTo(0L);
         }

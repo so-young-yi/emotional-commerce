@@ -1,14 +1,12 @@
-package com.loopers.domain.like;
+package com.loopers.application.like;
 
-import com.loopers.application.like.ProductLikeFacade;
-import com.loopers.application.like.ProductLikeInfo;
+import com.loopers.domain.like.ProductLikeRepository;
+import com.loopers.domain.like.ProductLikeService;
 import com.loopers.domain.product.ProductMetaModel;
 import com.loopers.domain.product.ProductMetaRepository;
 import com.loopers.domain.product.ProductMetaService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -24,11 +22,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DisplayName("ProductLike 동시성 테스트")
 class ProductLikeConcurrencyTest {
 
-    @Autowired private ProductLikeService productLikeService;
-    @Autowired private ProductLikeRepository productLikeRepository;
-    @Autowired private ProductMetaService productMetaService;
-    @Autowired private ProductMetaRepository productMetaRepository;
     @Autowired private ProductLikeFacade productLikeFacade;
+    @Autowired private ProductLikeService productLikeService;
+    @Autowired private ProductMetaService productMetaService;
+    @Autowired private ProductLikeRepository productLikeRepository;
+    @Autowired private ProductMetaRepository productMetaRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private void runConcurrent(int threadCount, Runnable task) throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -45,7 +46,6 @@ class ProductLikeConcurrencyTest {
     private void saveProductMeta(Long productId) {
         productMetaRepository.save(ProductMetaModel.builder()
                 .productId(productId)
-                .stock(10L)
                 .likeCount(0L)
                 .reviewCount(0L)
                 .viewCount(0L)

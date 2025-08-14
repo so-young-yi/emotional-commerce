@@ -1,7 +1,10 @@
-package com.loopers.domain.coupon;
+package com.loopers.application.coupon;
 
-import com.loopers.application.coupon.CouponFacade;
 import com.loopers.application.order.OrderFacade;
+import com.loopers.domain.coupon.CouponModel;
+import com.loopers.domain.coupon.CouponRepository;
+import com.loopers.domain.coupon.CouponType;
+import com.loopers.domain.coupon.UserCouponRepository;
 import com.loopers.domain.point.UserPointModel;
 import com.loopers.domain.point.UserPointRepository;
 import com.loopers.domain.product.*;
@@ -10,6 +13,8 @@ import com.loopers.domain.user.UserModel;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.order.OrderV1Dto;
 import com.loopers.support.Money;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,15 +35,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DisplayName("OrderFacade + Coupon 통합/동시성 테스트")
 class OrderWithCouponConcurrencyTest {
 
-    @Autowired
-    private OrderFacade orderFacade;
+    @Autowired private OrderFacade orderFacade;
     @Autowired private CouponFacade couponFacade;
     @Autowired private CouponRepository couponRepository;
     @Autowired private UserCouponRepository userCouponRepository;
     @Autowired private ProductRepository productRepository;
-    @Autowired private ProductMetaRepository productMetaRepository;
+    @Autowired private ProductStockRepository productStockRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private UserPointRepository userPointRepository;
+
+    @Autowired private DatabaseCleanUp databaseCleanUp;
+    @AfterEach void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     private Long userId;
     private Long productId;
@@ -53,7 +60,7 @@ class OrderWithCouponConcurrencyTest {
                 null, 1L, "상품", "설명", new Money(10_000L), ProductStatus.ON_SALE, ZonedDateTime.now()
         ));
         productId = product.getId();
-        productMetaRepository.save(ProductMetaModel.builder().productId(productId).stock(10L).likeCount(0L).reviewCount(0L).viewCount(0L).build());
+        productStockRepository.save(ProductStockModel.builder().productId(productId).stock(10L).build());
         CouponModel coupon = couponRepository.save(new CouponModel(CouponType.AMOUNT, 2000L, null, "2천원 할인쿠폰"));
         couponId = coupon.getId();
         couponFacade.issueCoupon(userId, couponId);
@@ -68,7 +75,7 @@ class OrderWithCouponConcurrencyTest {
         );
         orderFacade.orderAndPay(userId, request);
 
-        assertThat(productMetaRepository.findByProductId(productId).get().getStock()).isEqualTo(9L);
+        assertThat(productStockRepository.findByProductId(productId).get().getStock()).isEqualTo(9L);
         assertThat(userPointRepository.findByUserId(userId).get().getBalance()).isEqualTo(2_000L);
         assertThat(userCouponRepository.findByUserIdAndCouponId(userId, couponId).get().isUsed()).isTrue();
     }
