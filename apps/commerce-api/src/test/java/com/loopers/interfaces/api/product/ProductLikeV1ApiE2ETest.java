@@ -1,7 +1,10 @@
-package com.loopers.interfaces.api;
+package com.loopers.interfaces.api.product;
 
 
+import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.like.ProductLikeV1Dto;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,14 @@ class ProductLikeV1ApiE2ETest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    DatabaseCleanUp databaseCleanUp;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     @Nested
     @DisplayName("POST /api/v1/products/{productId}/likes")

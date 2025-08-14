@@ -1,13 +1,11 @@
-package com.loopers.interfaces.api;
+package com.loopers.interfaces.api.user;
 
 import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.UserModel;
 import com.loopers.infrastructure.user.UserJpaRepository;
-import com.loopers.interfaces.api.user.UserV1Dto;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -28,6 +26,14 @@ public class MeV1ApiE2ETest {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    DatabaseCleanUp databaseCleanUp;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     @DisplayName("GET /api/v1/me")
     @Nested

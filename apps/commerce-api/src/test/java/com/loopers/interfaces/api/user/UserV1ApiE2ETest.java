@@ -1,6 +1,8 @@
-package com.loopers.interfaces.api;
+package com.loopers.interfaces.api.user;
 
-import com.loopers.interfaces.api.user.UserV1Dto;
+import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,14 @@ public class UserV1ApiE2ETest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
+
+    @Autowired
+    DatabaseCleanUp databaseCleanUp;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     /**
      * 회원가입 E2E 테스트

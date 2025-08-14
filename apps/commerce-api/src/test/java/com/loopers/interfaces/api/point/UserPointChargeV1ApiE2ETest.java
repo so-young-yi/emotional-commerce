@@ -1,6 +1,8 @@
-package com.loopers.interfaces.api;
+package com.loopers.interfaces.api.point;
 
-import com.loopers.interfaces.api.point.UserPointV1Dto;
+import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserPointChargeV1ApiE2ETest {
 
-    @Autowired
-    private TestRestTemplate testRestTemplate;
+    @Autowired private TestRestTemplate testRestTemplate;
+    @Autowired DatabaseCleanUp databaseCleanUp;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     @DisplayName("POST /api/v1/points/charge")
     @Nested
@@ -33,7 +40,6 @@ public class UserPointChargeV1ApiE2ETest {
                 "INSERT INTO member (login_id, name, email, birth, gender, created_at, updated_at, deleted_at) VALUES ('riley', 'riley', 'riley@test.com', '2000-01-01', 'F', NOW(), NOW(), NULL)",
                 "INSERT INTO user_point (user_id, balance) VALUES (1, 0)"
         })
-
         void returnTotalAmount_whenChargeSuccess() {
             // arrange
             Long userId = 1L;

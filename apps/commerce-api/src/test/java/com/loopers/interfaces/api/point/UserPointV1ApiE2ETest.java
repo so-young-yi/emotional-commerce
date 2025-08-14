@@ -1,6 +1,6 @@
-package com.loopers.interfaces.api;
+package com.loopers.interfaces.api.point;
 
-import com.loopers.interfaces.api.point.UserPointV1Dto;
+import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,9 @@ public class UserPointV1ApiE2ETest {
     private DatabaseCleanUp databaseCleanUp;
 
     @AfterEach
-    void tearDown() {databaseCleanUp.truncateAllTables();}
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     @DisplayName("GET /api/v1/points")
     @Nested
