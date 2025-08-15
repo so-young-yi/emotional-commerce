@@ -19,7 +19,6 @@ public class MeV1ApiController implements MeV1ApiSpec {
     @GetMapping("/{id}")
     @Override
     public ApiResponse<UserV1Dto.UserResponse> me(@PathVariable Long id) {
-
         UserInfo userInfo = userFacade.getUserInfoById(id);
         UserV1Dto.UserResponse response = UserV1Dto.UserResponse.from(userInfo);
         return ApiResponse.success(response);

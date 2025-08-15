@@ -19,10 +19,6 @@ public class UserFacade {
     }
 
     public UserInfo getUserInfoById(Long id) {
-        UserModel userById = userService.getUserById(id);
-        if (userById == null) {
-            throw new CoreException(ErrorType.NOT_FOUND, "[id = " + id + "] 사용자를 찾을 수 없습니다.");
-        }
-        return UserInfo.from(userById);
+        return UserInfo.from(userService.getUserById(id));
     }
 }

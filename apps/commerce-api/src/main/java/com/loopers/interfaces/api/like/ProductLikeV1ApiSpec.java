@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface ProductLikeV1ApiSpec {
 
     @Operation(summary = "상품 좋아요 등록", description = "상품에 좋아요를 등록합니다.")
-    ApiResponse<Boolean> likeProduct(@RequestHeader("X-USER-ID") Long userId,
-                                    @PathVariable Long productId);
+    ApiResponse<ProductLikeV1Dto.ProductLikeResponse> likeProduct(
+            @RequestHeader("X-USER-ID") Long userId,
+            @PathVariable Long productId);
 
     @Operation(summary = "상품 좋아요 해제", description = "상품에 좋아요를 해제합니다.")
-    ApiResponse<Boolean> unlikeProduct(@RequestHeader("X-USER-ID") Long userId,
-                                     @PathVariable Long productId);
+    ApiResponse<ProductLikeV1Dto.ProductLikeResponse> unlikeProduct(
+            @RequestHeader("X-USER-ID") Long userId,
+            @PathVariable Long productId);
 }

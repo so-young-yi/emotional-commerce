@@ -18,20 +18,14 @@ public class ProductV1ApiController implements ProductV1ApiSpec {
     @GetMapping
     @Override
     public ApiResponse<ProductV1Dto.ProductListPageResponse> getProducts(@ModelAttribute ProductV1Dto.ProductRequest request) {
-
-        List<ProductV1Dto.ProductSummaryResponse> items = productFacade.getProductList(ProductSearchCriteria.from(request));
-        ProductV1Dto.ProductListPageResponse response = new ProductV1Dto.ProductListPageResponse(
-                items, items.size(), 1, request.page() != null ? request.page() : 0, request.size() != null ? request.size() : 20
-        );
+        ProductV1Dto.ProductListPageResponse response = productFacade.getProductList(ProductSearchCriteria.from(request));
         return ApiResponse.success(response);
     }
 
     @GetMapping("/{productId}")
     @Override
     public ApiResponse<ProductV1Dto.ProductDetailResponse> getProduct(@PathVariable Long productId) {
-
         ProductV1Dto.ProductDetailResponse response = productFacade.getProductDetail(productId);
         return ApiResponse.success(response);
     }
-
 }

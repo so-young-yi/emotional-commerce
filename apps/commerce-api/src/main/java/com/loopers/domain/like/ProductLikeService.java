@@ -1,6 +1,7 @@
 package com.loopers.domain.like;
 
 import com.loopers.application.like.ProductLikeInfo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class ProductLikeService {
 
     private final ProductLikeRepository productLikeRepository;
 
+    @Transactional
     public boolean likeProduct(ProductLikeInfo productLikeInfo){
         boolean alreadyLiked = isProductLiked(productLikeInfo);
         if(!alreadyLiked){
@@ -22,13 +24,11 @@ public class ProductLikeService {
         return true;
     };
 
-    public boolean unlikeProduct(ProductLikeInfo productLikeInfo){
-        boolean alreadyLiked = isProductLiked(productLikeInfo);
-        if (alreadyLiked) {
-            productLikeRepository.delete(productLikeInfo.userId(),productLikeInfo.productId());
-        }
+    @Transactional
+    public boolean unlikeProduct(ProductLikeInfo productLikeInfo) {
+        productLikeRepository.delete(productLikeInfo.userId(), productLikeInfo.productId());
         return false;
-    };
+    }
 
     // 상품의 좋아요여부
     public boolean isProductLiked(ProductLikeInfo productLikeInfo) {

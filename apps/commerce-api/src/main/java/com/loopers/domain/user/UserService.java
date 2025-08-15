@@ -20,7 +20,8 @@ public class UserService {
     }
 
     public UserModel getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[id = " + id + "] 사용자를 찾을 수 없습니다."));
     }
 
     @Transactional(readOnly = true)
@@ -28,7 +29,4 @@ public class UserService {
         return userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[loginId = " + loginId + "] 사용자를 찾을 수 없습니다."));
     }
-
-
-
 }

@@ -42,22 +42,4 @@ public class ProductService {
         }
     }
 
-    public void decreaseStock(Long productId, Long quantity) {
-        ProductModel product = productRepository.findById(productId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품이 존재하지 않습니다."));
-
-        if (!product.isOrderable()) {
-            throw new CoreException(ErrorType.CONFLICT, "상품이 판매중이 아닙니다.");
-        }
-
-        try {
-            product.decreaseStock(quantity);
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            throw new CoreException(ErrorType.BAD_REQUEST, e.getMessage());
-        }
-
-        productRepository.save(product);
-    }
-
-
 }

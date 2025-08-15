@@ -1,7 +1,5 @@
-package com.loopers.domain.order;
+package com.loopers.domain.payment;
 
-import com.loopers.domain.payment.PaymentModel;
-import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;

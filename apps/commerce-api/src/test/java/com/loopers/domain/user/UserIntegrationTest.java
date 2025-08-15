@@ -63,7 +63,6 @@ public class UserIntegrationTest {
                     () -> assertThat(result.getBirth()).isEqualTo(userModel.getBirth())
             );
             verify(userJpaRepository, times(1)).save(any(UserModel.class));
-
         }
 
         @DisplayName("이미 가입된 ID로 회원가입 시도 시 실패")
@@ -87,8 +86,6 @@ public class UserIntegrationTest {
 
             // assert
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-
         }
-
     }
 }

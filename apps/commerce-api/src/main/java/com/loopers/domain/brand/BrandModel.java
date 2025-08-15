@@ -1,19 +1,23 @@
 package com.loopers.domain.brand;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "brand")
 @Getter
-@NoArgsConstructor
-public class BrandModel {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class BrandModel extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false, length = 100)

@@ -19,9 +19,7 @@ public class ProductV1Dto {
             Long quantity,
             String status,
             Long likeCount
-    ){
-
-    }
+    ){}
 
     public record ProductListPageResponse(
             List<ProductSummaryResponse> items,
@@ -39,7 +37,5 @@ public class ProductV1Dto {
             Long quantity,
             String status,
             long likeCount
-    ){ }
-
-
+    ){}
 }

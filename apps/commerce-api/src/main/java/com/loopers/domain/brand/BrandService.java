@@ -26,7 +26,6 @@ public class BrandService {
         return brandRepository.findAll();
     }
 
-
     public BrandModel createBrand(String name, String description) {
         BrandModel brand = new BrandModel(name, description);
         return brandRepository.save(brand);

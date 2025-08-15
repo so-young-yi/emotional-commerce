@@ -92,20 +92,14 @@ class ProductLikeModelUnitTest {
         @Test
         @DisplayName("좋아요하지 않은 상품을 해제해도 아무 동작 없이 false를 반환한다 (멱등성)")
         void unlikeProduct_whenNotLiked_shouldNotDeleteAndReturnFalse() {
-
             // arrange
             ProductLikeInfo productLikeInfo = new ProductLikeInfo(1L, 1L);
-            boolean notExist = false;
-            Mockito.when(productLikeRepository.existsByUserIdAndProductId(
-                            productLikeInfo.userId(),
-                            productLikeInfo.productId()
-                    ))
-                    .thenReturn(notExist);
+
             // act
             boolean result = productLikeService.unlikeProduct(productLikeInfo);
 
             // assert
-            Mockito.verify(productLikeRepository,Mockito.never()).delete(Mockito.any(Long.class),Mockito.any(Long.class));
+            Mockito.verify(productLikeRepository).delete(productLikeInfo.userId(), productLikeInfo.productId());
             assertThat(result).isFalse();
         }
     }

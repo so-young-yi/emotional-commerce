@@ -5,6 +5,6 @@ import java.util.Optional;
 public interface UserPointRepository {
 
     Optional<UserPointModel> findByUserId(Long userId);
-    UserPointModel save (UserPointModel userPointModel);
-
+    Optional<UserPointModel> findByUserIdForUpdate(Long userId);
+    UserPointModel save(UserPointModel userPointModel);
 }

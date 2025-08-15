@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api;
 
 
+import com.loopers.interfaces.api.like.ProductLikeV1Dto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import org.springframework.http.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// ProductLikeV1ApiE2ETest.java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductLikeV1ApiE2ETest {
 
@@ -29,37 +29,42 @@ class ProductLikeV1ApiE2ETest {
         @Test
         @DisplayName("상품 좋아요 등록 성공")
         void likeProduct_whenNotLikedYet() {
-
             //arr
             long userId = 1L;
             long productId = 1L;
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-USER-ID", String.valueOf(userId));
             HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+
             //act
-            ParameterizedTypeReference<ApiResponse<Boolean>> responseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<Boolean>> response = restTemplate.exchange(ENDPOINT, HttpMethod.POST, httpEntity, responseType, productId);
+            ParameterizedTypeReference<ApiResponse<ProductLikeV1Dto.ProductLikeResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<ProductLikeV1Dto.ProductLikeResponse>> response =
+                    restTemplate.exchange(ENDPOINT, HttpMethod.POST, httpEntity, responseType, productId);
 
             //assert
-            assertThat(response.getBody().data()).isEqualTo(true);
+            ProductLikeV1Dto.ProductLikeResponse data = response.getBody().data();
+            assertThat(data.isLike()).isEqualTo(true);
+            assertThat(data.userId()).isEqualTo(userId);
+            assertThat(data.productId()).isEqualTo(productId);
         }
 
         @Test
         @DisplayName("미로그인 시 400 반환")
         void return401_whenNotLoggedIn() {
-
             //arr
             long productId = 1L;
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+
             //act
-            ParameterizedTypeReference<ApiResponse<Boolean>> responseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<Boolean>> response = restTemplate.exchange(ENDPOINT, HttpMethod.POST, httpEntity, responseType, productId);
-            System.out.println(response);
+            ParameterizedTypeReference<ApiResponse<ProductLikeV1Dto.ProductLikeResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<ProductLikeV1Dto.ProductLikeResponse>> response =
+                    restTemplate.exchange(ENDPOINT, HttpMethod.POST, httpEntity, responseType, productId);
 
             //assert
             assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-
         }
     }
 
@@ -71,19 +76,24 @@ class ProductLikeV1ApiE2ETest {
         @Test
         @DisplayName("상품 좋아요 해제 성공")
         void unlikeProduct_whenLiked() {
-
             //arr
             long userId = 1L;
             long productId = 1L;
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-USER-ID", String.valueOf(userId));
             HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+
             //act
-            ParameterizedTypeReference<ApiResponse<Boolean>> responseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<Boolean>> response = restTemplate.exchange(ENDPOINT, HttpMethod.DELETE, httpEntity, responseType, productId);
+            ParameterizedTypeReference<ApiResponse<ProductLikeV1Dto.ProductLikeResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<ProductLikeV1Dto.ProductLikeResponse>> response =
+                    restTemplate.exchange(ENDPOINT, HttpMethod.DELETE, httpEntity, responseType, productId);
 
             //assert
-            assertThat(response.getBody().data()).isEqualTo(false);
+            ProductLikeV1Dto.ProductLikeResponse data = response.getBody().data();
+            assertThat(data.isLike()).isEqualTo(false);
+            assertThat(data.userId()).isEqualTo(userId);
+            assertThat(data.productId()).isEqualTo(productId);
         }
     }
 }

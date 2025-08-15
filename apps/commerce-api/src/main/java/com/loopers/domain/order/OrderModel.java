@@ -4,7 +4,7 @@ import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,17 @@ import java.util.List;
 @Table(name = "orders")
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class OrderModel extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
+
     @Column(nullable = false)
     private Long userId;
 
@@ -24,30 +31,35 @@ public class OrderModel extends BaseEntity {
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItemModel> orderItems = new ArrayList<>();
+    private final List<OrderItemModel> orderItems = new ArrayList<>();
 
-    protected OrderModel() {}
-
-    public OrderModel(
-            Long userId,
-            OrderStatus status
-    ) {
-
+    @Builder
+    public OrderModel(Long userId, OrderStatus status) {
         if (userId == null || userId <= 0)
             throw new CoreException(ErrorType.BAD_REQUEST, "주문자 ID는 필수이며 1 이상이어야 합니다.");
         if (status == null)
             throw new CoreException(ErrorType.BAD_REQUEST, "주문 상태는 필수 입력값입니다.");
-
         this.userId = userId;
         this.status = status;
     }
 
     public void addOrderItem(OrderItemModel orderItem) {
         orderItems.add(orderItem);
-        orderItem.setOrder(this); // 자식에도 부모 세팅
+        orderItem.setOrder(this);
     }
 
     public void cancel() {
         this.status = OrderStatus.CANCELLED;
+    }
+
+    public void pay() {
+        if (this.status != OrderStatus.ORDERED) {
+            throw new CoreException(ErrorType.CONFLICT, "결제 가능한 상태가 아닙니다.");
+        }
+        this.status = OrderStatus.PAID;
+    }
+
+    public long getTotalAmount() {
+        return orderItems.stream().mapToLong(OrderItemModel::getTotalPrice).sum();
     }
 }

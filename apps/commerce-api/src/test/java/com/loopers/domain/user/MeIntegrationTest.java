@@ -1,6 +1,7 @@
 package com.loopers.domain.user;
 
 import com.loopers.infrastructure.user.UserJpaRepository;
+import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // 내 정보 조회 통합 테스트
 @SpringBootTest
@@ -38,10 +40,10 @@ public class MeIntegrationTest {
 
             // arrange
             UserModel userModel = userJpaRepository.save(new UserModel("riley",
-                                                                        "riley",
-                                                                        "riley@test.com",
-                                                                        "2000-01-01",
-                                                                        Gender.F));
+                    "riley",
+                    "riley@test.com",
+                    "2000-01-01",
+                    Gender.F));
 
             // act
             UserModel result = userService.getUserByLoginId(userModel.getLoginId());
@@ -55,18 +57,17 @@ public class MeIntegrationTest {
             );
         }
 
-        @DisplayName("해당 ID 회원이 없으면 null 반환")
+        @DisplayName("해당 ID 회원이 없으면 예외 발생")
         @Test
-        public void shouldReturnNullWhenUserDoesNotExist() {
+        public void shouldThrowExceptionWhenUserDoesNotExist() {
 
             // arrange
             Long invalidUserId = 99L;
 
-            // act
-            UserModel getUser = userService.getUserById( invalidUserId );
-
-            // assert
-            assertThat(getUser).isNull();
+            // act & assert
+            assertThrows(CoreException.class, () -> {
+                userService.getUserById(invalidUserId);
+            });
         }
     }
 }

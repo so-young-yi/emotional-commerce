@@ -1,5 +1,7 @@
 package com.loopers.domain.like;
 
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,10 @@ class ProductLikeIntegrationTest {
 
     @Autowired
     private ProductLikeRepository productLikeRepository;
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
+    @AfterEach
+    void tearDown() { databaseCleanUp.truncateAllTables(); }
 
     @Nested
     @DisplayName("상품 좋아요 등록/해제 통합 테스트")
@@ -65,8 +71,8 @@ class ProductLikeIntegrationTest {
         void countByProductId_shouldReturnCorrectCount() {
             // arrange
             Long productId = 10L;
-            productLikeRepository.save(new ProductLikeModel(1L, productId));
-            productLikeRepository.save(new ProductLikeModel(2L, productId));
+            productLikeRepository.save(new ProductLikeModel(10L, productId));
+            productLikeRepository.save(new ProductLikeModel(20L, productId));
 
             // act
             long count = productLikeRepository.countByProductId(productId);
@@ -79,7 +85,7 @@ class ProductLikeIntegrationTest {
         @DisplayName("사용자가 좋아요한 상품 목록을 조회할 수 있다")
         void findProductIdByUserId_shouldReturnLikedProductIds() {
             // arrange
-            Long userId = 1L;
+            Long userId = 100L;
             productLikeRepository.save(new ProductLikeModel(userId, 100L));
             productLikeRepository.save(new ProductLikeModel(userId, 200L));
 
