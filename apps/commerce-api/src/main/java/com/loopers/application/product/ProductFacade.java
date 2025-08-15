@@ -20,9 +20,9 @@ public class ProductFacade {
     private final BrandService brandService;
 
     public ProductV1Dto.ProductListPageResponse getProductList(ProductSearchCriteria criteria) {
-        Page<ProductSummaryProjection> productPage = productService.getProductSummaries(criteria);
-        List<ProductSummaryProjection> products = productPage.getContent();
-        List<Long> brandIds = products.stream().map(ProductSummaryProjection::getBrandId).distinct().toList();
+        Page<ProductSummaryInfo> productPage = productService.getProductSummaries(criteria);
+        List<ProductSummaryInfo> products = productPage.getContent();
+        List<Long> brandIds = products.stream().map(ProductSummaryInfo::brandId).distinct().toList();
         Map<Long, String> brandNameMap = brandIds.stream()
                 .collect(Collectors.toMap(
                         id -> id,
@@ -34,13 +34,13 @@ public class ProductFacade {
 
         List<ProductV1Dto.ProductSummaryResponse> dtos = products.stream()
                 .map(p -> new ProductV1Dto.ProductSummaryResponse(
-                        p.getId(),
-                        p.getName(),
-                        brandNameMap.get(p.getBrandId()),
-                        p.getSellPrice(),
-                        p.getStock(),
-                        p.getStatus(),
-                        p.getLikeCount()
+                        p.id(),
+                        p.name(),
+                        brandNameMap.get(p.brandId()),
+                        p.sellPrice(),
+                        p.stock(),
+                        p.status(),
+                        p.likeCount()
                 ))
                 .collect(Collectors.toList());
 
@@ -69,7 +69,7 @@ public class ProductFacade {
                 detail.getSellPrice(),
                 detail.getStock(),
                 detail.getStatus(),
-                detail.getLikeCount()
+                detail.getLikeCount() != null ? detail.getLikeCount() : 0L
         );
     }
 }

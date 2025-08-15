@@ -3,6 +3,7 @@ package com.loopers.domain.like;
 import com.loopers.application.like.ProductLikeInfo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class ProductLikeService {
 
     private final ProductLikeRepository productLikeRepository;
 
+    @CacheEvict(cacheNames = "product:list", allEntries = true)
     @Transactional
     public boolean likeProduct(ProductLikeInfo productLikeInfo){
         boolean alreadyLiked = isProductLiked(productLikeInfo);
@@ -24,6 +26,7 @@ public class ProductLikeService {
         return true;
     };
 
+    @CacheEvict(cacheNames = "product:list", allEntries = true)
     @Transactional
     public boolean unlikeProduct(ProductLikeInfo productLikeInfo) {
         productLikeRepository.delete(productLikeInfo.userId(), productLikeInfo.productId());

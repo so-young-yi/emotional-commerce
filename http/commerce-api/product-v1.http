@@ -1,0 +1,8 @@
+### 상품 목록 조회
+
+GET {{commerce-api}}/api/v1/products
+
+
+### 상품 상세 조회
+
+GET {{commerce-api}}/api/v1/products/1

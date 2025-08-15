@@ -4,6 +4,7 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class ProductStockService {
     /**
      * 재고 증가 (입고 등)
      */
+    @CacheEvict(cacheNames = "product:list", allEntries = true)
     @Transactional
     public void increaseStockWithLock(Long productId, long qty) {
         if (qty <= 0) throw new CoreException(ErrorType.BAD_REQUEST, "증가 수량은 1 이상이어야 합니다.");
@@ -39,6 +41,7 @@ public class ProductStockService {
     /**
      * 재고 감소 (주문 등)
      */
+    @CacheEvict(cacheNames = "product:list", allEntries = true)
     @Transactional
     public void decreaseStockWithLock(Long productId, long qty) {
         if (qty <= 0) throw new CoreException(ErrorType.BAD_REQUEST, "차감 수량은 1 이상이어야 합니다.");
