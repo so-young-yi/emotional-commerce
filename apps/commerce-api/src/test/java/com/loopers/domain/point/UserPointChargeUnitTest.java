@@ -14,18 +14,18 @@ public class UserPointChargeUnitTest {
 
     @DisplayName("0 이하 정수 충전 시 실패")
     @ParameterizedTest
-    @ValueSource(ints = {
+    @ValueSource(longs = {
             0,
             -1,
             -10,
             -100
     })
-    public void shouldFailWhenChargeAmountIsZeroOrNegative(int chargeAmount) {
+    public void shouldFailWhenChargeAmountIsZeroOrNegative(Long chargeAmount) {
 
         // arrange
         // act
         CoreException exception = assertThrows(CoreException.class, () -> {
-            new UserPointModel(1L, 0).charge(chargeAmount);
+            new UserPointModel(1L, 0L).charge(chargeAmount);
         });
 
         // assert

@@ -30,13 +30,14 @@ public class UserPointChargeV1ApiE2ETest {
         @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
         @Test
         @Sql(statements = {
-                "INSERT INTO member (user_id, name, email, birth, gender) VALUES (1, 'riley', 'riley@test.com', '2000-01-01', 'F')",
-                "INSERT INTO user_point (user_id, point) VALUES (1, 0)"
+                "INSERT INTO member (login_id, name, email, birth, gender, created_at, updated_at, deleted_at) VALUES ('riley', 'riley', 'riley@test.com', '2000-01-01', 'F', NOW(), NOW(), NULL)",
+                "INSERT INTO user_point (user_id, balance) VALUES (1, 0)"
         })
+
         void returnTotalAmount_whenChargeSuccess() {
             // arrange
             Long userId = 1L;
-            int chargeAmount = 1000;
+            Long chargeAmount = 1000L;
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-USER-ID", userId.toString());
@@ -65,7 +66,7 @@ public class UserPointChargeV1ApiE2ETest {
         void return404_whenUserDoesNotExist() {
             // arrange
             Long nonExistentUserId = 9999L;
-            int chargeAmount = 1000;
+            Long chargeAmount = 1000L;
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-USER-ID", nonExistentUserId.toString());

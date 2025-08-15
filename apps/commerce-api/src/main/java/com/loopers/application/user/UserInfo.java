@@ -14,7 +14,7 @@ public record UserInfo(Long id,
     public static UserInfo from(UserModel user) {
         return new UserInfo(
                 user.getId(),
-                user.getUserId(),
+                user.getLoginId(),
                 user.getName(),
                 user.getEmail(),
                 user.getBirth(),

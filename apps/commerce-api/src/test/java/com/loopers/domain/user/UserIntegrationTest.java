@@ -58,7 +58,7 @@ public class UserIntegrationTest {
             // assert
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUserId()).isEqualTo(userModel.getUserId()),
+                    () -> assertThat(result.getLoginId()).isEqualTo(userModel.getLoginId()),
                     () -> assertThat(result.getName()).isEqualTo(userModel.getName()),
                     () -> assertThat(result.getBirth()).isEqualTo(userModel.getBirth())
             );

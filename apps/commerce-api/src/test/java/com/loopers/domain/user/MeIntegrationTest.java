@@ -44,12 +44,12 @@ public class MeIntegrationTest {
                                                                         Gender.F));
 
             // act
-            UserModel result = userService.getUserByUserId(userModel.getUserId());
+            UserModel result = userService.getUserByLoginId(userModel.getLoginId());
 
             // assert
             assertAll(
                     ()-> assertThat(result).isNotNull(),
-                    ()-> assertThat(result.getUserId()).isEqualTo(userModel.getUserId()),
+                    ()-> assertThat(result.getLoginId()).isEqualTo(userModel.getLoginId()),
                     ()-> assertThat(result.getName()).isEqualTo(userModel.getName()),
                     ()-> assertThat(result.getEmail()).isEqualTo(userModel.getEmail())
             );

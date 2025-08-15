@@ -35,8 +35,8 @@ public class UserPointV1ApiE2ETest {
         @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
         @Test
         @Sql(statements = {
-                "INSERT INTO member (user_id, name, email, birth, gender) VALUES (1, 'riley', 'riley@test.com', '2000-01-01', 'F')",
-                "INSERT INTO user_point (user_id, point) VALUES (1, 1000)"
+                "INSERT INTO member (login_id, name, email, birth, gender, created_at, updated_at, deleted_at) VALUES ('riley', 'riley', 'riley@test.com', '2000-01-01', 'F', NOW(), NOW(), NULL)",
+                "INSERT INTO user_point (user_id, balance) VALUES (1, 1000)"
         })
         void returnPoint_whenUserExists() {
 

@@ -33,7 +33,7 @@ public class UserPointIntegrationTest {
         private UserPointFacade userPointFacade;
 
         Long testUserId;
-        int testUserPoint;
+        Long testUserPoint;
 
         @BeforeEach
         void setUp() {
@@ -42,8 +42,8 @@ public class UserPointIntegrationTest {
                                                 "riley@test.com",
                                                 "2000-01-01",
                                                 Gender.F));
-            UserPointModel save = userPointRepository.save(new UserPointModel(1L,1000));
-            testUserPoint = save.getPoint();
+            UserPointModel save = userPointRepository.save(new UserPointModel(1L,1000L));
+            testUserPoint = save.getBalance();
             testUserId = save.getUserId();
         }
 

@@ -1,5 +1,6 @@
 package com.loopers.domain.user;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
@@ -11,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "member")
 @Getter
 @NoArgsConstructor
-public class UserModel {
+public class UserModel extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String userId;
+    private String loginId;
     private String name;
     private String email;
     private String birth;
@@ -29,13 +30,13 @@ public class UserModel {
     private final String PATTERN_BIRTH = "^\\d{4}-\\d{2}-\\d{2}$";
 
     public UserModel(
-            String userId,
+            String loginId,
             String name,
             String email,
             String birth,
             Gender gender
     ){
-        if ( userId == null || !userId.matches(PATTERN_USER_ID) ) {
+        if ( loginId == null || !loginId.matches(PATTERN_USER_ID) ) {
             throw new CoreException(
                     ErrorType.BAD_REQUEST,
                     "ID는 영문 및 숫자 10자 이내로 입력해야 합니다."
@@ -59,7 +60,7 @@ public class UserModel {
                     "성별은 필수입니다."
             );
         }
-        this.userId = userId;
+        this.loginId = loginId;
         this.name = name;
         this.email = email;
         this.birth = birth;
