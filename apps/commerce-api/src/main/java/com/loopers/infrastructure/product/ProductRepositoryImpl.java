@@ -1,10 +1,9 @@
 package com.loopers.infrastructure.product;
 
+import com.loopers.domain.product.ProductDetailProjection;
 import com.loopers.domain.product.ProductModel;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.user.UserModel;
-import com.loopers.domain.user.UserRepository;
-import com.loopers.infrastructure.user.UserJpaRepository;
+import com.loopers.domain.product.ProductSummaryProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,4 +37,13 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.findAll( pageable );
     }
 
+    @Override
+    public Page<ProductSummaryProjection> findProductSummaries(Long brandId, Pageable pageable) {
+        return productJpaRepository.findProductSummaries(brandId, pageable);
+    }
+
+    @Override
+    public Optional<ProductDetailProjection> findProductDetailById(Long productId) {
+        return productJpaRepository.findProductDetailById(productId);
+    }
 }

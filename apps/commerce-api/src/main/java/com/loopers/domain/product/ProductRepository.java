@@ -11,4 +11,6 @@ public interface ProductRepository {
     ProductModel save( ProductModel product );
     Page<ProductModel> findByBrandId( Long brandId, Pageable pageable );
     Page<ProductModel> findAll( Pageable pageable );
+    Page<ProductSummaryProjection> findProductSummaries(Long brandId, Pageable pageable);
+    Optional<ProductDetailProjection> findProductDetailById(Long productId);
 }

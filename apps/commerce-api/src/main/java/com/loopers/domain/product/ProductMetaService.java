@@ -36,7 +36,6 @@ public class ProductMetaService {
         ProductMetaModel meta = productMetaRepository.findByProductId(productId)
                 .orElse(ProductMetaModel.builder()
                         .productId(productId)
-                        .stock(0L)
                         .likeCount(0L)
                         .reviewCount(0L)
                         .viewCount(0L)
@@ -50,34 +49,11 @@ public class ProductMetaService {
         ProductMetaModel meta = productMetaRepository.findByProductId(productId)
                 .orElse(ProductMetaModel.builder()
                         .productId(productId)
-                        .stock(0L)
                         .likeCount(0L)
                         .reviewCount(0L)
                         .viewCount(0L)
                         .build());
         meta.decreaseLike();
-        productMetaRepository.save(meta);
-    }
-
-    @Transactional
-    public void increaseStock(Long productId, long qty) {
-        ProductMetaModel meta = productMetaRepository.findByProductId(productId)
-                .orElse(ProductMetaModel.builder()
-                        .productId(productId)
-                        .stock(0L)
-                        .likeCount(0L)
-                        .reviewCount(0L)
-                        .viewCount(0L)
-                        .build());
-        meta.increaseStock(qty);
-        productMetaRepository.save(meta);
-    }
-
-    @Transactional
-    public void decreaseStock(Long productId, long qty) {
-        ProductMetaModel meta = productMetaRepository.findByProductIdForUpdate(productId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품 메타정보가 존재하지 않습니다."));
-        meta.decreaseStock(qty);
         productMetaRepository.save(meta);
     }
 

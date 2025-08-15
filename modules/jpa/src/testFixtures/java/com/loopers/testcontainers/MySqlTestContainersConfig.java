@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+/**
+ * MySQL Testcontainer 설정
+ */
 @Configuration
 public class MySqlTestContainersConfig {
 

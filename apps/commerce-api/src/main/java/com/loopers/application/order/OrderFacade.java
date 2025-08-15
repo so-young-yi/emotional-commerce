@@ -7,9 +7,7 @@ import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentModel;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.point.UserPointService;
-import com.loopers.domain.product.ProductMetaService;
-import com.loopers.domain.product.ProductModel;
-import com.loopers.domain.product.ProductService;
+import com.loopers.domain.product.*;
 import com.loopers.interfaces.api.order.OrderV1Dto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -31,7 +29,7 @@ public class OrderFacade {
     private final PaymentService paymentService;
     private final ProductService productService;
     private final UserPointService pointService;
-    private final ProductMetaService productMetaService;
+    private final ProductStockService productStockService;
     private final CouponService couponService;
 
     @Transactional
@@ -51,8 +49,10 @@ public class OrderFacade {
 
         PaymentModel payment = paymentService.pay(order.getId(), totalAmount);
 
+        orderService.markOrderAsPaid(order.getId());
+
         for (OrderItemModel orderItem : order.getOrderItems()) {
-            productMetaService.decreaseStock(orderItem.getProductId(), orderItem.getQuantity());
+            productStockService.decreaseStockWithLock(orderItem.getProductId(), orderItem.getQuantity());
         }
 
         return new OrderInfo(order, payment);
@@ -62,11 +62,11 @@ public class OrderFacade {
     public OrderModel createOrder(Long userId, OrderV1Dto.OrderRequest request) {
         List<OrderItemModel> orderItems = request.items().stream()
                 .map(item -> {
-                    ProductModel product = productService.getProductDetail(item.productId());
+                    ProductDetailProjection product = productService.getProductDetail(item.productId());
                     return new OrderItemModel(
                             product.getId(),
                             item.quantity(),
-                            product.getSellPrice().getAmount(),
+                            product.getSellPrice(),
                             product.getName()
                     );
                 })

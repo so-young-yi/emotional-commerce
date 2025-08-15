@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MySQL 테스트 데이터 제거 유틸
+ */
 @Component
 public class DatabaseCleanUp implements InitializingBean {
 
