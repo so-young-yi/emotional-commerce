@@ -20,6 +20,7 @@ spring:
   config:
     import:
       - jpa.yml
+      - redis.yml
       - logging.yml
       - monitoring.yml
 
@@ -27,6 +28,14 @@ springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  packages-to-scan: com.loopers.interfaces.api
 
 ---
 spring:
