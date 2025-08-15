@@ -6,12 +6,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -101,4 +105,14 @@ public class RedisConfig{
         template.setConnectionFactory(connectionFactory);
         return template;
     }
+
+
+    @Bean
+    public RedisCacheManager cacheManager(RedisConnectionFactory cf) {
+        RedisCacheConfiguration cfg = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(5));   // 전역 TTL 5분
+        return RedisCacheManager.builder(cf).cacheDefaults(cfg).build();
+    }
+
+
 }
