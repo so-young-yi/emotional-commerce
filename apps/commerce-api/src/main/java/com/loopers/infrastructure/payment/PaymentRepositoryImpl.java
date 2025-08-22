@@ -32,7 +32,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public List<PaymentModel> findByOrderId(Long orderId) {
+    public Optional<PaymentModel> findByOrderId(Long orderId) {
         return paymentJpaRepository.findByOrderId(orderId);
     }
 

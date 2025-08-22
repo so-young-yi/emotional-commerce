@@ -1,10 +1,12 @@
 package com.loopers.domain.payment;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.payment.dto.PgType;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.ZonedDateTime;
 
@@ -21,8 +23,22 @@ public class PaymentModel extends BaseEntity {
 
     private ZonedDateTime paidAt;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
+
+    @Setter
+    @Column(name = "transaction_key")
+    private String transactionKey;
+
+    @Setter
+    @Column(name = "reason")
+    private String reason;
+
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pg_type")
+    private PgType pgType;
 
     protected PaymentModel() {}
 
@@ -39,6 +55,12 @@ public class PaymentModel extends BaseEntity {
         this.amount = amount;
         this.paidAt = paidAt;
         this.status = status;
+    }
+
+    public void apply(PaymentResult result) {
+        this.status = result.status();
+        this.reason = result.reason();
+        this.transactionKey = result.transactionKey();
     }
 
     public void pay() {

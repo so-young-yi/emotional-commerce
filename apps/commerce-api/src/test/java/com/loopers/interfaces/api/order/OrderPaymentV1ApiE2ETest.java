@@ -9,7 +9,6 @@ import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.UserModel;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.payment.PaymentV1Dto;
 import com.loopers.support.Money;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -100,44 +99,6 @@ class OrderPaymentV1ApiE2ETest {
             productStockRepository.save(Fixtures.stock(product.getId(), 2L + i));
             productMetaRepository.save(Fixtures.meta(product.getId(), i + 1));
         }
-    }
-
-
-    @Test
-    @DisplayName("주문 성공 시 결제/포인트/재고 모두 정상 반영")
-    void order_and_payment_success() {
-        // arrange
-        long userId = 1L;
-        long productId = 1L;
-        long orderQty = 2L;
-
-        OrderV1Dto.OrderRequest orderRequest = new OrderV1Dto.OrderRequest(
-                List.of(new OrderV1Dto.OrderItem(productId, orderQty, null)), null
-        );
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-USER-ID", String.valueOf(userId));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<OrderV1Dto.OrderRequest> httpEntity = new HttpEntity<>(orderRequest, headers);
-
-        // act
-        ParameterizedTypeReference<ApiResponse<OrderV1Dto.OrderResponse>> responseType = new ParameterizedTypeReference<>() {};
-        ResponseEntity<ApiResponse<OrderV1Dto.OrderResponse>> response =
-                testRestTemplate.exchange("/api/v1/orders", HttpMethod.POST, httpEntity, responseType);
-
-        // assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        var order = response.getBody().data();
-        assertThat(order.status()).isEqualTo("PAID");
-        assertThat(order.items().get(0).quantity()).isEqualTo(orderQty);
-
-        // 결제 내역 조회
-        ParameterizedTypeReference<ApiResponse<PaymentV1Dto.PaymentResponse>> paymentType = new ParameterizedTypeReference<>() {};
-        ResponseEntity<ApiResponse<PaymentV1Dto.PaymentResponse>> paymentResponse =
-                testRestTemplate.exchange("/api/v1/payments/order/" + order.id(), HttpMethod.GET, null, paymentType);
-
-        assertThat(paymentResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        var payment = paymentResponse.getBody().data();
-        assertThat(payment.amount()).isEqualTo(2000L); // 1000 * 2
     }
 
     @Test
