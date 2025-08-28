@@ -1,28 +1,34 @@
 package com.loopers.application.payment;
 
+import com.loopers.domain.payment.PaymentResult;
+import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.payment.dto.Payment;
-import com.loopers.domain.payment.dto.PgType;
+import com.loopers.domain.payment.dto.PaymentMethod;
 import com.loopers.infrastructure.external.pg.PaymentGateway;
+import com.loopers.infrastructure.external.pg.PgGatewayResolver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @RequiredArgsConstructor
-@Component("CARD")
+@Component
 public class CardPaymentProcessor implements PaymentProcessor<Payment.CardRequest, Payment.CardResponse> {
 
-    private final Map<PgType, PaymentGateway> gatewayMap; // PG 종류별로 주입
+    private final PgGatewayResolver pgResolver;
+    private final PaymentService paymentService;
+
+    @Value("${client.pg-simulator.callback-url.v1}")
+    private String callbackUrl;
+
+    @Override
+    public PaymentMethod method() { return PaymentMethod.CARD; }
 
     @Override
     public Payment.CardResponse process(Payment.CardRequest request) {
-
-        PgType pgType = request.getPgType();
-        PaymentGateway gateway = gatewayMap.get(pgType);
-        if (gateway == null) throw new IllegalArgumentException("지원하지 않는 PG: " + pgType);
-
-        String callbackUrl = "http://localhost:8080/api/v1/payment/callback";
-        return gateway.requestPayment(request, callbackUrl);
+        PaymentGateway gateway = pgResolver.resolve(request.getPgType());
+        Payment.CardResponse response = gateway.requestPayment(request, callbackUrl);
+        PaymentResult result = PaymentResult.fromCardResponse(response);
+        paymentService.recordResult(request.getOrderId(), result);
+        return response;
     }
-
 }

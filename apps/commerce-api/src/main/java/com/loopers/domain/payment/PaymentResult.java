@@ -15,6 +15,14 @@ public record PaymentResult(PaymentStatus status, String reason, String transact
         return new PaymentResult(status, response.reason(), response.transactionKey());
     }
 
+    public static PaymentResult fromCardResponse(Payment.CardResponse response) {
+        return new PaymentResult(
+                response.getStatus(),
+                response.getReason(),
+                response.getTransactionKey()
+        );
+    }
+
     public Payment.CardResponse toCardResponse() {
         return new Payment.CardResponse(status, transactionKey, reason);
     }

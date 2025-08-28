@@ -11,29 +11,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class PaymentFacade {
 
     private final PaymentService paymentService;
-    private final Map<PaymentMethod, PaymentProcessor<?,?>> processorMap;
+    private final Map<PaymentMethod, PaymentProcessor<?, ?>> processorMap;
 
-    public Payment.Response pay(Payment.Request request) {
-        PaymentMethod method = request.getPaymentMethod();
-        switch (method) {
-            case CARD -> {
-                PaymentProcessor<Payment.CardRequest, Payment.CardResponse> processor =
-                        (PaymentProcessor<Payment.CardRequest, Payment.CardResponse>) processorMap.get(method);
-                return processor.process((Payment.CardRequest) request);
-            }
-            case POINT -> {
-                PaymentProcessor<Payment.PointRequest, Payment.PointResponse> processor =
-                        (PaymentProcessor<Payment.PointRequest, Payment.PointResponse>) processorMap.get(method);
-                return processor.process((Payment.PointRequest) request);
-            }
-            // 현금 등 추가
-            default -> throw new IllegalArgumentException("지원하지 않는 결제 방식: " + method);
+    @SuppressWarnings("unchecked")
+    public <R extends Payment.Response> R pay(Payment.Request<R> request) {
+        PaymentProcessor<Payment.Request<R>, R> processor =
+                (PaymentProcessor<Payment.Request<R>, R>) processorMap.get(request.getPaymentMethod());
+        if (processor == null) {
+            throw new IllegalArgumentException("Unsupported payment method: " + request.getPaymentMethod());
         }
+        return processor.process(request);
     }
 
     public PaymentInfo getPayment(Long paymentId) {

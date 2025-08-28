@@ -1,7 +1,6 @@
 package com.loopers.infrastructure.external.pg;
 
 import com.loopers.domain.payment.PaymentResult;
-import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.payment.dto.Payment;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 /* TODO 멀티 pg 로 추가된다면 */
 @RequiredArgsConstructor
-@Component("TOSS")
+@Component
 public class TossGateway implements PaymentGateway {
 
     @Override
