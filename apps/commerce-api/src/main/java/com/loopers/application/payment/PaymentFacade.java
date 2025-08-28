@@ -1,13 +1,20 @@
 package com.loopers.application.payment;
 
+import com.loopers.application.event.PaymentCompletedEvent;
+import com.loopers.application.event.PaymentFailedEvent;
+import com.loopers.domain.order.OrderModel;
+import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentModel;
 import com.loopers.domain.payment.PaymentResult;
 import com.loopers.domain.payment.PaymentService;
+import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.payment.dto.Payment;
 import com.loopers.domain.payment.dto.PaymentMethod;
 import com.loopers.infrastructure.external.pg.PgClientDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -16,7 +23,9 @@ import java.util.Map;
 public class PaymentFacade {
 
     private final PaymentService paymentService;
+    private final OrderService orderService;
     private final Map<PaymentMethod, PaymentProcessor<?, ?>> processorMap;
+    private final ApplicationEventPublisher eventPublisher;
 
     @SuppressWarnings("unchecked")
     public <R extends Payment.Response> R pay(Payment.Request<R> request) {
@@ -43,9 +52,17 @@ public class PaymentFacade {
         paymentService.refund(paymentId);
     }
 
+    @Transactional
     public void handlePgCallback(PgClientDto.PgResponse pgResponse) {
         PaymentResult result = PaymentResult.fromPgResponse(pgResponse);
-        paymentService.recordResult(Long.valueOf(pgResponse.orderId()), result);
+        Long orderId = Long.valueOf(pgResponse.orderId());
+        paymentService.recordResult(orderId, result);
+        OrderModel orderModel = orderService.getOrderDetail(orderId);
+        if (result.status() == PaymentStatus.PAID) {
+            PaymentModel payment = paymentService.getPaymentByOrderId(orderId);
+            eventPublisher.publishEvent(new PaymentCompletedEvent(orderId, orderModel.getUserId(), payment));
+        } else if (result.status() == PaymentStatus.FAILED) {
+            eventPublisher.publishEvent(new PaymentFailedEvent(orderId, orderModel.getUserId(), result.reason()));
+        }
     }
-
 }
