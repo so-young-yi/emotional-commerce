@@ -40,7 +40,8 @@ class CouponIntegrationTest {
     @DisplayName("쿠폰 발급 성공")
     void issueCoupon_success() {
         couponFacade.issueCoupon(userId, couponId);
-        assertThat(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).isPresent();
+        CouponModel coupon = couponRepository.findById(couponId).orElseThrow();
+        assertThat(userCouponRepository.findByUserIdAndCoupon(userId, coupon)).isPresent();
     }
 
     @Test
@@ -56,7 +57,8 @@ class CouponIntegrationTest {
         couponFacade.issueCoupon(userId, couponId);
         long discount = couponFacade.useCoupon(userId, couponId, 10_000L);
         assertThat(discount).isEqualTo(2000L);
-        assertThat(userCouponRepository.findByUserIdAndCouponId(userId, couponId).get().isUsed()).isTrue();
+        CouponModel coupon = couponRepository.findById(couponId).orElseThrow();
+        assertThat(userCouponRepository.findByUserIdAndCoupon(userId, coupon).orElseThrow().isUsed()).isTrue();
     }
 
     @Test

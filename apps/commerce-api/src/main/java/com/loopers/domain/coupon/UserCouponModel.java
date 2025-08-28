@@ -18,17 +18,21 @@ public class UserCouponModel extends BaseEntity {
     private Long id;
 
     private Long userId;
-    private Long couponId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "couponId", referencedColumnName = "id")
+    private CouponModel coupon;
+
     private boolean used = false;
 
     @Version
     private Long version; // 낙관적 락
 
-    public UserCouponModel(Long userId, Long couponId) {
+    public UserCouponModel(Long userId, CouponModel coupon) {
         if (userId == null || userId <= 0) throw new CoreException(ErrorType.BAD_REQUEST, "유저 ID는 필수입니다.");
-        if (couponId == null || couponId <= 0) throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 ID는 필수입니다.");
+        if (coupon == null) throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 정보는 필수입니다.");
         this.userId = userId;
-        this.couponId = couponId;
+        this.coupon = coupon;
         this.used = false;
     }
 
@@ -41,4 +45,7 @@ public class UserCouponModel extends BaseEntity {
         this.used = false;
     }
 
+    public long calculateDiscount(long orderAmount) {
+        return coupon.calculateDiscount(orderAmount);
+    }
 }

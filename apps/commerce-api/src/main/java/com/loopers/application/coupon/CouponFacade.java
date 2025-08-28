@@ -25,8 +25,8 @@ public class CouponFacade {
         return couponService.getUserCoupons(userId);
     }
 
-    public long calculateDiscount(Long couponId, long orderAmount) {
-        return couponService.calculateDiscount(couponId, orderAmount);
+    public long calculateDiscount(Long userId, Long couponId, long orderAmount) {
+        return couponService.calculateDiscount(userId, couponId, orderAmount);
     }
 
     public void restoreCoupon(Long userId, Long couponId) {
