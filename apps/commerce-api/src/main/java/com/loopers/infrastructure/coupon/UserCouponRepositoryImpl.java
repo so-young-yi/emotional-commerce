@@ -1,5 +1,6 @@
 package com.loopers.infrastructure.coupon;
 
+import com.loopers.domain.coupon.CouponModel;
 import com.loopers.domain.coupon.UserCouponModel;
 import com.loopers.domain.coupon.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     private final UserCouponJpaRepository userCouponJpaRepository;
 
     @Override
-    public Optional<UserCouponModel> findByUserIdAndCouponId(Long userId, Long couponId) {
-        return userCouponJpaRepository.findByUserIdAndCouponId(userId,couponId);
+    public Optional<UserCouponModel> findByUserIdAndCoupon(Long userId, CouponModel coupon) {
+        return userCouponJpaRepository.findByUserIdAndCoupon(userId, coupon);
     }
 
     @Override
@@ -28,5 +29,4 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     public List<UserCouponModel> findAllByUserId(Long userId) {
         return userCouponJpaRepository.findAllByUserId(userId);
     }
-
 }

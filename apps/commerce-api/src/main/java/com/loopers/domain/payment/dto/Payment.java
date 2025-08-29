@@ -6,7 +6,7 @@ import lombok.*;
 public class Payment {
 
     // 공통 인터페이스
-    public interface Request {
+    public interface Request<R extends Response> {
         Long getOrderId();
         Long getUserId();
         Long getAmount();
@@ -21,7 +21,7 @@ public class Payment {
     // 카드 결제
     @Getter
     @RequiredArgsConstructor
-    public static class CardRequest implements Request {
+    public static class CardRequest implements Request<CardResponse> {
         private final Long orderId;
         private final Long userId;
         private final Long amount;
@@ -30,7 +30,6 @@ public class Payment {
         private final PgType pgType;
 
         @Override public PaymentMethod getPaymentMethod() { return PaymentMethod.CARD; }
-        public PgType getPgType() { return pgType; }
     }
 
     @Getter
@@ -41,10 +40,9 @@ public class Payment {
         private final String reason;
     }
 
-    // 포인트 결제
     @Getter
     @RequiredArgsConstructor
-    public static class PointRequest implements Request {
+    public static class PointRequest implements Request<PointResponse> {
         private final Long orderId;
         private final Long userId;
         private final Long amount;
@@ -58,5 +56,4 @@ public class Payment {
         private final String reason;
     }
 
-    // 현금 등 다른 결제수단도 동일하게 추가 가능
 }

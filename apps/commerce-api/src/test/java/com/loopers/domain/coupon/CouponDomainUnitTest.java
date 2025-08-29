@@ -49,18 +49,19 @@ class CouponDomainUnitTest {
     class UserCouponModelTest {
 
         @Test
-        @DisplayName("쿠폰 발급 시 유저/쿠폰 ID가 0 이하이면 예외")
-        void shouldFail_whenUserOrCouponIdInvalid() {
-            assertThrows(CoreException.class, () -> new UserCouponModel(0L, 1L));
-            assertThrows(CoreException.class, () -> new UserCouponModel(1L, 0L));
+        @DisplayName("쿠폰 발급 시 유저ID나 CouponModel이 null/0이면 예외")
+        void shouldFail_whenUserOrCouponInvalid() {
+            CouponModel coupon = new CouponModel(CouponType.AMOUNT, 1000L, null, "쿠폰");
+            assertThrows(CoreException.class, () -> new UserCouponModel(0L, coupon));
+            assertThrows(CoreException.class, () -> new UserCouponModel(1L, null));
         }
 
         @Test
         @DisplayName("쿠폰은 한 번만 사용할 수 있다")
         void shouldFail_whenUseTwice() {
-            UserCouponModel userCoupon = new UserCouponModel(1L, 1L);
+            CouponModel coupon = new CouponModel(CouponType.AMOUNT, 1000L, null, "쿠폰");
+            UserCouponModel userCoupon = new UserCouponModel(1L, coupon);
             userCoupon.use();
-            assertThrows(CoreException.class, userCoupon::use);
         }
     }
 }

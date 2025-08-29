@@ -1,5 +1,7 @@
 package com.loopers.domain.payment;
 
+import com.loopers.domain.payment.dto.PgType;
+import com.loopers.infrastructure.external.pg.PaymentGateway;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final Map<PgType, PaymentGateway> gatewayMap;
 
     @Transactional
     public void recordResult(Long orderId, PaymentResult result) {
@@ -67,6 +71,28 @@ public class PaymentService {
         payment.setStatus(status);
         payment.setReason(reason);
         paymentRepository.save(payment);
+    }
+
+    public void checkPendingPayments() {
+
+        List<PaymentModel> pendings = getPaymentsByStatus(PaymentStatus.PENDING);
+        for (PaymentModel payment : pendings) {
+            try {
+                PgType pgType = payment.getPgType();
+                PaymentGateway gateway = gatewayMap.get(pgType);
+                if (gateway == null) {
+                    // log.warn("PG Gateway 없음: {}", pgType);
+                    continue;
+                }
+                PaymentStatus status = gateway.checkPaymentStatus(payment.getTransactionKey());
+                if (status != PaymentStatus.PENDING && status != payment.getStatus()) {
+                    updatePaymentStatus(payment.getOrderId(), status, null);
+                    // log.info("결제 상태 업데이트: orderId={}, old={}, new={}", payment.getOrderId(), payment.getStatus(), status);
+                }
+            } catch (Exception e) {
+                // log.warn("PG 상태 확인 실패: orderId={}, error={}", payment.getOrderId(), e.getMessage());
+            }
+        }
     }
 
 }

@@ -71,11 +71,11 @@ springdoc:
 
 client:
   pg-simulator:
-    x-user-id: 960412
+    x-user-id: 135135
     url:
-      ver-1: http://localhost:8082/api/v1
+      v1: http://localhost:8082/api/v1
     callback-url:
-      ver-1: http://localhost:8080/api/v1/payments/callback
+      v1: http://localhost:8080/api/v1/payment/callback
 
 ---
 spring:

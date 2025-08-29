@@ -1,7 +1,6 @@
 package com.loopers.infrastructure.external.pg;
 
 import com.loopers.domain.payment.PaymentResult;
-import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.payment.dto.Payment;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -11,11 +10,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Component("PG_SIMULATOR")
+@Component
 public class PgSimulatorGateway implements PaymentGateway {
 
     private final PgClient pgClient;
-    private final PaymentService paymentService;
 
     @Override
     @CircuitBreaker(name = "pgCircuit", fallbackMethod = "fallback")
@@ -32,13 +30,11 @@ public class PgSimulatorGateway implements PaymentGateway {
         } else {
             result = PaymentResult.fromPgResponse(apiResponse.data());
         }
-        paymentService.recordResult(request.getOrderId(), result);
         return result.toCardResponse();
     }
 
     public Payment.CardResponse fallback(Payment.CardRequest request, String callbackUrl, Throwable t) {
         PaymentResult result = new PaymentResult(PaymentStatus.FAILED, "PG_UNAVAILABLE", null);
-        paymentService.recordResult(request.getOrderId(), result);
         return result.toCardResponse();
     }
 

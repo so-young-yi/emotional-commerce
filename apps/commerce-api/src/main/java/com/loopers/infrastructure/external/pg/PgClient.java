@@ -9,7 +9,7 @@ import java.util.List;
 
 @FeignClient(
         name = "pgApiClient",
-        url = "${client.pg-simulator.url.ver-1}",
+        url = "${client.pg-simulator.url.v1}",
         configuration = PgFeignConfig.class
 )
 public interface PgClient {

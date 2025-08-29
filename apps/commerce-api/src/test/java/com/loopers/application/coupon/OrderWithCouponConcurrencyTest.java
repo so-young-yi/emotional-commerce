@@ -77,7 +77,9 @@ class OrderWithCouponConcurrencyTest {
 
         assertThat(productStockRepository.findByProductId(productId).get().getStock()).isEqualTo(9L);
         assertThat(userPointRepository.findByUserId(userId).get().getBalance()).isEqualTo(2_000L);
-        assertThat(userCouponRepository.findByUserIdAndCouponId(userId, couponId).get().isUsed()).isTrue();
+
+        CouponModel coupon = couponRepository.findById(couponId).orElseThrow();
+        assertThat(userCouponRepository.findByUserIdAndCoupon(userId, coupon).orElseThrow().isUsed()).isTrue();
     }
 
     @Test
@@ -113,6 +115,7 @@ class OrderWithCouponConcurrencyTest {
 
         assertThat(successCount).isEqualTo(1L);
         assertThat(failCount).isEqualTo(9L);
-        assertThat(userCouponRepository.findByUserIdAndCouponId(userId, couponId).get().isUsed()).isTrue();
+        CouponModel coupon = couponRepository.findById(couponId).orElseThrow();
+        assertThat(userCouponRepository.findByUserIdAndCoupon(userId, coupon).orElseThrow().isUsed()).isTrue();
     }
 }
