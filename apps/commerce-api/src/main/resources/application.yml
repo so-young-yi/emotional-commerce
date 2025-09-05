@@ -1,4 +1,5 @@
 server:
+  port: 8080
   shutdown: graceful
   tomcat:
     threads:
@@ -21,8 +22,10 @@ spring:
     import:
       - jpa.yml
       - redis.yml
+      - kafka.yml
       - logging.yml
       - monitoring.yml
+
   datasource:
     hikari:
       connection-timeout: 3000       # 커넥션 풀에서 커넥션 얻는 최대 대기 시간
@@ -82,11 +85,11 @@ spring:
   config:
     activate:
       on-profile: local, test
+  kafka:
+    properties:
+      auto:
+        create.topics.enable: true
 
-logging:
-  level:
-    org.springframework.cache: DEBUG
-    org.springframework.data.redis.cache: DEBUG
 
 ---
 spring:

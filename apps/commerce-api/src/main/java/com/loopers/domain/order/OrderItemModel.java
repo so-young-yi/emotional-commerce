@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -32,6 +33,7 @@ public class OrderItemModel extends BaseEntity {
 
     private String productNameSnapshot;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private OrderModel order;
