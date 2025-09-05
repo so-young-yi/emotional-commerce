@@ -2,10 +2,10 @@ package com.loopers.application.like;
 
 import com.loopers.application.event.ProductLikedEvent;
 import com.loopers.application.event.ProductUnlikedEvent;
+import com.loopers.application.event.kafka.KafkaEventPublisher;
 import com.loopers.domain.like.ProductLikeService;
 import com.loopers.domain.product.ProductMetaService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +15,7 @@ public class ProductLikeFacade {
 
     private final ProductLikeService productLikeService;
     private final ProductMetaService productMetaService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final KafkaEventPublisher eventPublisher;
 
     @Transactional
     public boolean likeProduct(Long userId, Long productId) {

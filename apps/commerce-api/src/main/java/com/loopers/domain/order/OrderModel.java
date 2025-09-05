@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -30,6 +31,7 @@ public class OrderModel extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<OrderItemModel> orderItems = new ArrayList<>();
 

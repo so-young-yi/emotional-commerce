@@ -2,6 +2,7 @@ package com.loopers.application.payment;
 
 import com.loopers.application.event.PaymentCompletedEvent;
 import com.loopers.application.event.PaymentFailedEvent;
+import com.loopers.application.event.kafka.KafkaEventPublisher;
 import com.loopers.domain.order.OrderModel;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentModel;
@@ -25,7 +26,7 @@ public class PaymentFacade {
     private final PaymentService paymentService;
     private final OrderService orderService;
     private final Map<PaymentMethod, PaymentProcessor<?, ?>> processorMap;
-    private final ApplicationEventPublisher eventPublisher;
+    private final KafkaEventPublisher eventPublisher;
 
     @SuppressWarnings("unchecked")
     public <R extends Payment.Response> R pay(Payment.Request<R> request) {

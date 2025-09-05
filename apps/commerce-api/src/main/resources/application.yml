@@ -1,4 +1,5 @@
 server:
+  port: 8080
   shutdown: graceful
   tomcat:
     threads:
@@ -24,6 +25,7 @@ spring:
       - kafka.yml
       - logging.yml
       - monitoring.yml
+
   datasource:
     hikari:
       connection-timeout: 3000       # 커넥션 풀에서 커넥션 얻는 최대 대기 시간

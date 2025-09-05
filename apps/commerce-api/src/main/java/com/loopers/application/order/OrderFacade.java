@@ -1,6 +1,7 @@
 package com.loopers.application.order;
 
 import com.loopers.application.event.OrderCreatedEvent;
+import com.loopers.application.event.kafka.KafkaEventPublisher;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.OrderItemModel;
 import com.loopers.domain.order.OrderModel;
@@ -15,7 +16,6 @@ import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +33,7 @@ public class OrderFacade {
     private final UserPointService pointService;
     private final ProductStockService productStockService;
     private final CouponService couponService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final KafkaEventPublisher eventPublisher;
 
     @Transactional
     public OrderInfo orderAndPay(Long userId, OrderV1Dto.OrderRequest request) {
