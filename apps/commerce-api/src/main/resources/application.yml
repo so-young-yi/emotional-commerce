@@ -21,6 +21,7 @@ spring:
     import:
       - jpa.yml
       - redis.yml
+      - kafka.yml
       - logging.yml
       - monitoring.yml
   datasource:
@@ -82,11 +83,11 @@ spring:
   config:
     activate:
       on-profile: local, test
+  kafka:
+    properties:
+      auto:
+        create.topics.enable: true
 
-logging:
-  level:
-    org.springframework.cache: DEBUG
-    org.springframework.data.redis.cache: DEBUG
 
 ---
 spring:
