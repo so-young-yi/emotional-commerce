@@ -1,4 +1,4 @@
-package com.loopers.collector.domain.auditlog;
+package com.loopers.collector.domain.event;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
-/* 감사로그 */
 @Getter
 @Entity
 @Table(name = "event_log")

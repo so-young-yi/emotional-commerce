@@ -1,4 +1,4 @@
-package com.loopers.collector.domain.common;
+package com.loopers.collector.domain.event;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
-/* 멱등성 보장 */
 @Getter
 @Entity
 @Table(name = "event_handled")
