@@ -24,6 +24,9 @@ spring:
       - redis.yml
       - kafka.yml
       - logging.yml
+  batch:
+    jdbc:
+      initialize-schema: always
 demo-kafka:
   test:
     topic-name: demo.internal.topic-v1

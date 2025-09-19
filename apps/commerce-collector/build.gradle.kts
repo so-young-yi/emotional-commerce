@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 dependencies {
     // add-ons
     implementation(project(":modules:jpa"))
@@ -10,6 +12,9 @@ dependencies {
     // web
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    
+    // batch
+    implementation("org.springframework.boot:spring-boot-starter-batch")
 
     // querydsl
     annotationProcessor("com.querydsl:querydsl-apt::jakarta")
@@ -22,4 +27,8 @@ dependencies {
     testImplementation(testFixtures(project(":modules:kafka")))
 
     testImplementation("org.testcontainers:kafka")
+    testImplementation("org.springframework.batch:spring-batch-test")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("org.awaitility:awaitility")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
 }
