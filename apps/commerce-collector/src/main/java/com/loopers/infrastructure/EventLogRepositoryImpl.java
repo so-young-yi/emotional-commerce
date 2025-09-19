@@ -1,7 +1,7 @@
 package com.loopers.infrastructure;
 
-import com.loopers.collector.domain.auditlog.EventLog;
-import com.loopers.collector.domain.auditlog.EventLogRepository;
+import com.loopers.collector.domain.event.EventLog;
+import com.loopers.collector.domain.event.EventLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

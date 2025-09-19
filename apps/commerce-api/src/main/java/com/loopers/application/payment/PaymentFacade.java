@@ -13,7 +13,6 @@ import com.loopers.domain.payment.dto.Payment;
 import com.loopers.domain.payment.dto.PaymentMethod;
 import com.loopers.infrastructure.external.pg.PgClientDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,10 +58,13 @@ public class PaymentFacade {
         Long orderId = Long.valueOf(pgResponse.orderId());
         paymentService.recordResult(orderId, result);
         OrderModel orderModel = orderService.getOrderDetail(orderId);
+
         if (result.status() == PaymentStatus.PAID) {
+            orderService.markOrderAsPaid(orderId);
             PaymentModel payment = paymentService.getPaymentByOrderId(orderId);
             eventPublisher.publishEvent(new PaymentCompletedEvent(orderId, orderModel.getUserId(), payment));
         } else if (result.status() == PaymentStatus.FAILED) {
+            orderService.cancelOrder(orderId);
             eventPublisher.publishEvent(new PaymentFailedEvent(orderId, orderModel.getUserId(), result.reason()));
         }
     }

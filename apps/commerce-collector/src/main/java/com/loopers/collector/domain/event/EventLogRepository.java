@@ -1,4 +1,4 @@
-package com.loopers.collector.domain.auditlog;
+package com.loopers.collector.domain.event;
 
 
 public interface EventLogRepository {

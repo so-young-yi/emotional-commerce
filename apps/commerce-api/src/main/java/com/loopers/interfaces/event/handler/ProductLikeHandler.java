@@ -4,10 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.application.event.ProductLikedEvent;
 import com.loopers.application.event.ProductUnlikedEvent;
+import com.loopers.event.*;
 import com.loopers.interfaces.event.dto.KafkaMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +32,7 @@ public class ProductLikeHandler {
         log.info("좋아요 해제 {} → {}", event.userId(), event.productId());
     }
 
-    @KafkaListener(topics = "product-events", groupId = "collector")
+    @KafkaListener(topics = "product-events", groupId = "product-like-handler")
     @Transactional
     public void consume(String message) throws Exception {
         KafkaMessage<Map<String, Object>> wrapper = objectMapper.readValue(
